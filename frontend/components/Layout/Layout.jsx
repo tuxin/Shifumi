@@ -6,7 +6,7 @@ import LeftSide from '../LeftSide/LeftSide';
 const Layout = ({ children }) => {
     return (
         <Flex justifyContent="space-between" alignItems="center" direction="column" height="100vh">
-            <Header />
+            
             {children}
             <Footer />
         </Flex>

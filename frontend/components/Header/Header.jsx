@@ -7,16 +7,12 @@ import "@fontsource/alice"
 
 const Header = () => {
     return (
-        <Flex bg='red.500' justifyContent="space-between" alignItems="center" height="6vh" width="100%" p="2rem">
+        <Flex  justifyContent="space-between" alignItems="center" height="4vh" width="100%" p="1rem">
             <Flex width="10%" justifyContent="space-between" alignItems="center">
-                <Image width="50%" src='/logo.png' alt='Shifumi' />
+                <Image width="30%" src='/logo.png' alt='Shifumi' />
                 <Text fontFamily="Cinzel Decorative" fontSize="2rem">Shifumi</Text>
             </Flex>
-            <Flex width="60%" justifyContent="space-between" alignItems="left">
-                <Text fontFamily="Alice" color="white" fontWeight="bold"><Link href="/">Home</Link></Text>
-                <Text color="#ffa0a8"><Link href="/getNumber">Get the number</Link></Text>
-                <Text color="#ffa0a8"><Link href="/setNumber">Set the number</Link></Text>
-            </Flex>
+           
             <ConnectButton.Custom>
                 {({
                     account,
