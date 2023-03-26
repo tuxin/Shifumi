@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
 import { useAccount, useProvider, useSigner } from 'wagmi'
-import { InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
+import { SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
 import { Input } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
@@ -28,13 +28,13 @@ export default function Home() {
         h='100%'
         width='100%'
         p="1rem"
-        templateRows='repeat(2, 1fr)'
+        templateRows='repeat(1, 1fr)'
         templateColumns='repeat(5, 1fr)'
         gap={3}
       >
         <GridItem rowSpan={2} colSpan={1}  >
         
-          <Card height="100%" alignItems="top"> 
+          <Card alignItems="top"> 
           <Flex width="80%" justifyContent="space-between" alignItems="center">
                 <Image width="1000" height="200" src='/logo.png' alt='Shifumi' />
                
@@ -64,7 +64,9 @@ export default function Home() {
                 
               </Stack>
             </CardBody>
+            </Card>
           <br></br>
+          <Card alignItems="top">
             <CardBody >
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
@@ -89,147 +91,71 @@ export default function Home() {
         Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
       </Button>
         </GridItem>
-        <GridItem colSpan={4} >
 
-        <Card>
-        <Box width="100%" align="right" p="5px">
-        <ConnectButton.Custom>
-                {({
-                    account,
-                    chain,
-                    openAccountModal,
-                    openChainModal,
-                    openConnectModal,
-                    authenticationStatus,
-                    mounted,
-                }) => {
-                    // Note: If your app doesn't use authentication, you
-                    // can remove all 'authenticationStatus' checks
-                    const ready = mounted && authenticationStatus !== 'loading';
-                    const connected =
-                    ready &&
-                    account &&
-                    chain &&
-                    (!authenticationStatus ||
-                        authenticationStatus === 'authenticated');
+        
 
-                    return (
-                    <div
-                        {...(!ready && {
-                        'aria-hidden': true,
-                        'style': {
-                            opacity: 0,
-                            pointerEvents: 'none',
-                            userSelect: 'none',
-                        },
-                        })}
-                    >
-                        {(() => {
-                        if (!connected) {
-                            return (
-                            <button onClick={openConnectModal} type="button" >
-                                Connect Wallet
-                            </button>
-                            );
-                        }
+      <GridItem colSpan={4} >
 
-                        if (chain.unsupported) {
-                            return (
-                            <button onClick={openChainModal} type="button">
-                                Wrong network
-                            </button>
-                            );
-                        }
-
-                        return (
-                            <div style={{ display: 'flex', gap: 12 }}>
-                            <button
-                                onClick={openChainModal}
-                                style={{ display: 'flex', alignItems: 'center' }}
-                                type="button"
-                            >
-                                {chain.hasIcon && (
-                                <div
-                                    style={{
-                                    background: chain.iconBackground,
-                                    width: 12,
-                                    height: 12,
-                                    borderRadius: 999,
-                                    overflow: 'hidden',
-                                    marginRight: 4,
-                                    }}
-                                >
-                                    {chain.iconUrl && (
-                                    <img
-                                        alt={chain.name ?? 'Chain icon'}
-                                        src={chain.iconUrl}
-                                        style={{ width: 12, height: 12 }}
-                                    />
-                                    )}
-                                </div>
-                                )}
-                                {chain.name}
-                            </button>
-
-                            <button onClick={openAccountModal} type="button">
-                                {account.displayName}
-                                {account.displayBalance
-                                ? ` (${account.displayBalance})`
-                                : ''}
-                            </button>
-                            </div>
-                        );
-                        })()}
-                    </div>
-                    );
-                }}
-            </ConnectButton.Custom>
-            </Box>
+      <Grid 
+        width='100%'
+        
+        templateRows='repeat(1, 1fr)'
+        templateColumns='repeat(4, 1fr)'
+        gap={3}
+      >
+        <GridItem rowSpan={1} colSpan={1}  >
+          <Card>
             <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                <Box>
-                <Heading size='md' textTransform='uppercase' fontFamily="alice">
-                    Weekly Protocol Statistics
-                </Heading>
-                <br></br><br></br>
-                <StatGroup>
-                  <Stat>
-                    <StatLabel>Bankroll</StatLabel>
-                    <StatNumber>345,670$</StatNumber>
-                    <StatHelpText>
-                      <StatArrow type='increase' />
-                      3.36%
-                    </StatHelpText>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Players</StatLabel>
-                    <StatNumber>156</StatNumber>
-                    <StatHelpText>
-                      <StatArrow type='decrease' />
-                      1.05%
-                    </StatHelpText>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Games played</StatLabel>
-                    <StatNumber>560</StatNumber>
-                    <StatHelpText>
-                      <StatArrow type='increase' />
-                      3.13%
-                    </StatHelpText>
-                  </Stat>
-                  <Stat>
-                    <StatLabel>Fees</StatLabel>
-                    <StatNumber>763$</StatNumber>
-                    <StatHelpText>
-                      <StatArrow type='increase' />
-                      13.67%
-                    </StatHelpText>
-                  </Stat>
-                </StatGroup>
-                </Box>
-              </Stack>
+              <Stat>
+                <StatLabel>Bankroll</StatLabel>
+                <StatNumber>345,670$</StatNumber>
+                <StatHelpText>
+                <StatArrow type='increase' />3.36%</StatHelpText>
+              </Stat>
             </CardBody>
           </Card>
+        </GridItem>
+        <GridItem rowSpan={1} colSpan={1}  >
+          <Card>
+            <CardBody>
+              <Stat>
+                <StatLabel>Players</StatLabel>
+                <StatNumber>156</StatNumber>
+                <StatHelpText>
+                <StatArrow type='decrease' />1,05%</StatHelpText>
+              </Stat>
+            </CardBody>
+          </Card>
+        </GridItem>
+        <GridItem rowSpan={1} colSpan={1}  >
+          <Card>
+            <CardBody>
+              <Stat>
+                <StatLabel>Games played</StatLabel>
+                <StatNumber>560</StatNumber>
+                <StatHelpText>
+                <StatArrow type='increase' />3.13%</StatHelpText>
+              </Stat>
+            </CardBody>
+          </Card>
+        </GridItem>
+        <GridItem rowSpan={1} colSpan={1}  >
+          <Card>
+            <CardBody>
+              <Stat>
+                <StatLabel>Fees</StatLabel>
+                <StatNumber>763</StatNumber>
+                <StatHelpText>
+                <StatArrow type='increase' />13.36%</StatHelpText>
+              </Stat>
+            </CardBody>
+          </Card>
+        </GridItem>
+        </Grid>
+
+    
+          
+        
           <br></br>
           <Card >
             <CardBody>
@@ -241,93 +167,45 @@ export default function Home() {
                   <br></br>
                 </Box>
                 
+                <VStack
+                  spacing={2}
+                  align='stretch'
+                >
+                  <Box>
+                    <Center>
+                      <Text fontSize='50px' color='tomato'  fontFamily="alice">X 1,97</Text>
+                    </Center>
+                  </Box>
+                  <Box>
+                    <Center>
+                      <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
+                    </Center>
+                  </Box>
+                  <Box>
+                    <Center>
+                      <Input width="20%" type='number' align="right"/>
+                    </Center> 
+                  </Box>
+                  <Box>
+                    <Center>
+                      <Text fontSize='10px' color='black'  fontFamily="alice">3% fees - Bankroll 30994 - Max payout 2000</Text>
+                    </Center>
+                  </Box>
+                  <Box>
+                    <Center>
+                      <Button width="20%" colorScheme='blue'>Heads to win 10 matic</Button>
+                    </Center> 
+                  </Box>
+                </VStack>
+
                 
 
-
-                <Grid
-                  h='200px'
-                  templateRows='repeat(2, 1fr)'
-                  templateColumns='repeat(4, 1fr)'
-                  gap={4}
-                >
+                
+                          
                   
-                  <GridItem colSpan={4} bg='tomato'>
-                    <Center>
-                      <Text fontSize='50px' color='red'  fontFamily="alice">X 1,97</Text>
-                    </Center>
-                  </GridItem>
-
-                  <GridItem colSpan={2} bg='papayawhip' align="right">
-                    <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
-                  </GridItem>
-                  <GridItem h="100%" colSpan={2} bg='papayawhip'>
-                    <Center>
-                    <InputGroup size='md' width="50%" h="10%">
-                      <InputLeftElement>
-                        <Image width="32" height="32" src='/matic.png' alt='Shifumi' />
-                      </InputLeftElement>
-                      <Input type='number' align="right"/>
-                      <InputRightElement width='4.5rem'>
-                          <Button width="200px" colorScheme='blue'>Bet</Button>  
-                      </InputRightElement>
-                    </InputGroup> 
-                    </Center>
-                  </GridItem>
-                  
-
-                  <GridItem colSpan={4} bg='tomato'>
-                    <Center>
-                      <Text fontSize='50px' color='red'  fontFamily="alice">X 1,97</Text>
-                    </Center>
-                  </GridItem>
-                  
-                </Grid>
-
-                <Grid
-                  templateRows='repeat(2, 1fr)'
-                  templateColumns='repeat(4, 1fr)'
-                  gap={4}
-                >
-                  
-                  <GridItem colSpan={4} align="right">
-                    <Center>
-                    
-                    </Center>
-                  </GridItem>
-                  
-                 
-                  <GridItem colSpan={1} align="right">
-                  <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
-                  </GridItem>
-                  <GridItem rowSpan={1} colSpan={3} align="center" >
-                  <InputGroup size='md' width="25%" h="10%">
-                    <InputLeftElement>
-                    <Image width="32" height="32" src='/matic.png' alt='Shifumi' />
-                    </InputLeftElement>
-                        <Input type='number' align="right"/>
-                        <InputRightElement width='4.5rem'>
-                        <Button width="200px" colorScheme='blue'>Bet</Button>  
-                        </InputRightElement>
-                    </InputGroup> 
-                  </GridItem>
                   
 
 
-                  <GridItem  colSpan={4} align="center">
-                    <Center>
-                    <Image width="32" height="32" src='/plusone.png' alt='Shifumi' />
-                    </Center>
-                  </GridItem>  
-                  <GridItem  colSpan={4} align="center">
-                    <Center>
-                      <Image width="32" height="32" src='/matic.png' alt='Shifumi' />
-                      <Image width="32" height="32" src='/matic.png' alt='Shifumi' />
-                      <Image width="32" height="32" src='/matic.png' alt='Shifumi' />
-
-                      
-                    </Center>
-                  </GridItem>
-                </Grid>
                 
               </Stack>
             </CardBody>
