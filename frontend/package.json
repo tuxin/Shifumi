@@ -15,11 +15,18 @@
     "@fontsource/alice": "^4.5.10",
     "@fontsource/cinzel-decorative": "^4.5.10",
     "@rainbow-me/rainbowkit": "^0.12.1",
+    "assert": "^2.0.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^6.0.3",
     "ethers": "^5.7.0",
     "framer-motion": "^10.6.0",
+    "fs": "^0.0.1-security",
     "next": "13.2.4",
+    "process": "^0.11.10",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5",
     "wagmi": "^0.12.2"
   }
 }

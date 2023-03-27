@@ -8,12 +8,13 @@ import { Input } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/alice"
+import { Test } from 'truffle'
 
 export default function Home() {
 
   const { address, isConnected } = useAccount()
   const { colorMode, toggleColorMode } = useColorMode()
-
+ 
 
   return (
     <>
@@ -31,6 +32,7 @@ export default function Home() {
         templateRows='repeat(1, 1fr)'
         templateColumns='repeat(5, 1fr)'
         gap={3}
+        backgroundColor="#f5f8fe"
       >
         <GridItem rowSpan={2} colSpan={1}  >
         
@@ -93,7 +95,13 @@ export default function Home() {
         </GridItem>
 
         
-
+        <GridItem colSpan={4} p="0 0 1rem">
+        <Card>
+            <CardBody>
+              Barre de connection et information
+            </CardBody>
+          </Card>
+          </GridItem>
       <GridItem colSpan={4} >
 
       <Grid 
@@ -106,56 +114,109 @@ export default function Home() {
         <GridItem rowSpan={1} colSpan={1}  >
           <Card>
             <CardBody>
-              <Stat>
-                <StatLabel>Bankroll</StatLabel>
-                <StatNumber>345,670$</StatNumber>
-                <StatHelpText>
-                <StatArrow type='increase' />3.36%</StatHelpText>
-              </Stat>
+              <HStack spacing='24px'>
+                <Box >
+                  <Image
+                    borderRadius='full'
+                    boxSize='64px'
+                    src='/somme.png'
+                    alt='Dan Abramov'
+                    width="64"
+                    height="64"
+                  />
+                </Box>
+                <Box >
+                  <Stat>
+                    <StatLabel color="#aab4d3" fontFamily="alice">Bankroll</StatLabel>
+                    <StatNumber  fontFamily="alice">345,670$</StatNumber>
+                    <StatHelpText  fontFamily="alice">
+                    <StatArrow type='increase' />3.36%</StatHelpText>
+                  </Stat>
+                </Box>
+              </HStack>
             </CardBody>
           </Card>
         </GridItem>
         <GridItem rowSpan={1} colSpan={1}  >
           <Card>
             <CardBody>
-              <Stat>
-                <StatLabel>Players</StatLabel>
-                <StatNumber>156</StatNumber>
-                <StatHelpText>
-                <StatArrow type='decrease' />1,05%</StatHelpText>
-              </Stat>
+              <HStack spacing='24px'>
+                <Box >
+                  <Image
+                    borderRadius='full'
+                    boxSize='64px'
+                    src='/players.png'
+                    alt='Dan Abramov'
+                    width="64"
+                    height="64"
+                  />
+                </Box>
+                <Box >
+                  <Stat>
+                    <StatLabel color="#aab4d3"  fontFamily="alice">Players</StatLabel>
+                    <StatNumber  fontFamily="alice">105</StatNumber>
+                    <StatHelpText  fontFamily="alice">
+                    <StatArrow type='decrease' />1.05%</StatHelpText>
+                  </Stat>
+                </Box>
+              </HStack>
             </CardBody>
           </Card>
         </GridItem>
         <GridItem rowSpan={1} colSpan={1}  >
           <Card>
             <CardBody>
-              <Stat>
-                <StatLabel>Games played</StatLabel>
-                <StatNumber>560</StatNumber>
-                <StatHelpText>
-                <StatArrow type='increase' />3.13%</StatHelpText>
-              </Stat>
+              <HStack spacing='24px'>
+                <Box >
+                  <Image
+                    borderRadius='full'
+                    boxSize='64px'
+                    src='/played.png'
+                    alt='Dan Abramov'
+                    width="64"
+                    height="64"
+                  />
+                </Box>
+                <Box >
+                  <Stat>
+                    <StatLabel color="#aab4d3" font="alice">Games Played</StatLabel>
+                    <StatNumber  fontFamily="alice">2390</StatNumber>
+                    <StatHelpText  fontFamily="alice">
+                    <StatArrow type='increase' />6.84%</StatHelpText>
+                  </Stat>
+                </Box>
+              </HStack>
             </CardBody>
           </Card>
         </GridItem>
         <GridItem rowSpan={1} colSpan={1}  >
           <Card>
             <CardBody>
-              <Stat>
-                <StatLabel>Fees</StatLabel>
-                <StatNumber>763</StatNumber>
-                <StatHelpText>
-                <StatArrow type='increase' />13.36%</StatHelpText>
-              </Stat>
+              <HStack spacing='24px'>
+                <Box >
+                  <Image
+                    borderRadius='full'
+                    boxSize='64px'
+                    src='/fees.png'
+                    alt='Dan Abramov'
+                    width="64"
+                    height="64"
+                  />
+                </Box>
+                <Box >
+                  <Stat>
+                    <StatLabel color="#aab4d3"  fontFamily="alice">Fees</StatLabel>
+                    <StatNumber  fontFamily="alice">721$</StatNumber>
+                    <StatHelpText  fontFamily="alice">
+                    <StatArrow type='increase' />2.55%</StatHelpText>
+                  </Stat>
+                </Box>
+              </HStack>
             </CardBody>
           </Card>
         </GridItem>
         </Grid>
 
-    
-          
-        
           <br></br>
           <Card >
             <CardBody>
@@ -173,7 +234,7 @@ export default function Home() {
                 >
                   <Box>
                     <Center>
-                      <Text fontSize='50px' color='tomato'  fontFamily="alice">X 1,97</Text>
+                      <Text fontSize='50px' color="#aab4d3"  fontFamily="alice">X 1,97</Text>
                     </Center>
                   </Box>
                   <Box>
@@ -193,7 +254,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <Button width="20%" colorScheme='blue'>Heads to win 10 matic</Button>
+                      <Button width="20%" colorScheme='blue'>Heads to win  matic</Button>
                     </Center> 
                   </Box>
                 </VStack>
