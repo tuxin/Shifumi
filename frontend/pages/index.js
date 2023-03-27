@@ -8,12 +8,19 @@ import { Input } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/alice"
-import { Test } from 'truffle'
+import React, { useState } from 'react';
 
 export default function Home() {
 
   const { address, isConnected } = useAccount()
   const { colorMode, toggleColorMode } = useColorMode()
+  const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
+
+  const handleWinningAmountChange  = (event) => {
+    setWinningAmount(event.target.value);
+  };
+
+  
  
 
   return (
@@ -95,15 +102,33 @@ export default function Home() {
         </GridItem>
 
         
-        <GridItem colSpan={4} p="0 0 1rem">
-        <Card>
-            <CardBody>
-              Barre de connection et information
-            </CardBody>
-          </Card>
-          </GridItem>
+
+
+        
+
+
+
+
+
+
       <GridItem colSpan={4} >
 
+      <Grid 
+        width='100%'
+        
+        templateRows='repeat(1, 1fr)'
+        templateColumns='repeat(4, 1fr)'
+        gap={3}
+      >
+        <GridItem rowSpan={1} colSpan={4}  >
+          <Card>
+            <CardBody>
+              Barre de connexion et autre
+            </CardBody>
+          </Card>
+        </GridItem>
+        </Grid>
+<br></br>
       <Grid 
         width='100%'
         
@@ -233,9 +258,24 @@ export default function Home() {
                   align='stretch'
                 >
                   <Box>
-                    <Center>
-                      <Text fontSize='50px' color="#aab4d3"  fontFamily="alice">X 1,97</Text>
-                    </Center>
+                    
+                  <HStack spacing='24px' >
+                  <Box  w='60%' align="right">
+                  <Text fontSize='50px' color="#FFD700"  fontFamily="alice">{winningAmoutMessage}</Text>
+                  </Box>
+                  <Box w='50%'  >
+                  <Image width="128" height="128" src='/matic.png' alt='Shifumi' />
+                  </Box>
+
+                </HStack>
+ 
+  
+
+  
+    
+
+                      
+                    
                   </Box>
                   <Box>
                     <Center>
@@ -244,7 +284,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <Input width="20%" type='number' align="right"/>
+                      <Input width="20%" type='number' align="right" onChange={handleWinningAmountChange}/>
                     </Center> 
                   </Box>
                   <Box>
@@ -254,7 +294,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <Button width="20%" colorScheme='blue'>Heads to win  matic</Button>
+                      <Button width="20%" colorScheme='blue'>Heads to win matic</Button>
                     </Center> 
                   </Box>
                 </VStack>
