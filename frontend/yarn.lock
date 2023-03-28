@@ -1391,6 +1391,11 @@
   resolved "https://registry.yarnpkg.com/@fontsource/alice/-/alice-4.5.10.tgz#d2fe51aaf4098e627371e43c62010c7ccaac1fc5"
   integrity sha512-MJveFvHGyrCvbfjLuNCy7/Zu1YpNLRegQcAnScx8b9eDqYpTUOqzkok8VMoo0xH0m8eI7299wMme0Y054yKICg==
 
+"@fontsource/archivo-black@^4.5.9":
+  version "4.5.9"
+  resolved "https://registry.yarnpkg.com/@fontsource/archivo-black/-/archivo-black-4.5.9.tgz#16d385f4a80aea4f9afc33e8c46abff12eb19341"
+  integrity sha512-4RJFvUub8nW1GGXxznLqtdh0DuFUTti7/uTzZ/Gs9SRq9bdiMqwZ+0SsF/mA8uERO37kg/YJuQ5fydJCi/DD5Q==
+
 "@fontsource/cinzel-decorative@^4.5.10":
   version "4.5.10"
   resolved "https://registry.yarnpkg.com/@fontsource/cinzel-decorative/-/cinzel-decorative-4.5.10.tgz#0ff1d917235987bc5ab817d1db040ca6a2dbd999"

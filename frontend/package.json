@@ -13,6 +13,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/alice": "^4.5.10",
+    "@fontsource/archivo-black": "^4.5.9",
     "@fontsource/cinzel-decorative": "^4.5.10",
     "@rainbow-me/rainbowkit": "^0.12.1",
     "assert": "^2.0.0",
