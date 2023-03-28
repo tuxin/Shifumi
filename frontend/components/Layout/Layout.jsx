@@ -8,8 +8,8 @@ const Layout = ({ children }) => {
         <Flex justifyContent="space-between" alignItems="center" direction="column" height="100vh" >
             
             {children}
-            <Footer />
-        </Flex>
+            
+        </Flex> 
     )   
 }
 

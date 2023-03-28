@@ -2,12 +2,12 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
 import { useAccount, useProvider, useSigner } from 'wagmi'
-import { SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
+import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
 import { Input } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
-import "@fontsource/alice"
+
 import React, { useState } from 'react';
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Layout >
+      <Layout>
       <Grid 
         h='100%'
         width='100%'
@@ -39,7 +39,6 @@ export default function Home() {
         templateRows='repeat(1, 1fr)'
         templateColumns='repeat(5, 1fr)'
         gap={3}
-        backgroundColor="#f5f8fe"
       >
         <GridItem rowSpan={2} colSpan={1}  >
         
@@ -243,7 +242,15 @@ export default function Home() {
         </Grid>
 
           <br></br>
-          <Card >
+          <Grid 
+        width='100%'
+        
+        templateRows='repeat(1, 1fr)'
+        templateColumns='repeat(4, 1fr)'
+        gap={3}
+      >
+         <GridItem rowSpan={1} colSpan={3}  >
+         <Card >
             <CardBody>
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
@@ -252,31 +259,12 @@ export default function Home() {
                   </Heading>
                   <br></br>
                 </Box>
-                
+              
                 <VStack
                   spacing={2}
                   align='stretch'
                 >
-                  <Box>
-                    
-                  <HStack spacing='24px' >
-                  <Box  w='60%' align="right">
-                  <Text fontSize='50px' color="#FFD700"  fontFamily="alice">{winningAmoutMessage}</Text>
-                  </Box>
-                  <Box w='50%'  >
-                  <Image width="128" height="128" src='/matic.png' alt='Shifumi' />
-                  </Box>
-
-                </HStack>
- 
-  
-
-  
-    
-
-                      
-                    
-                  </Box>
+                  
                   <Box>
                     <Center>
                       <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
@@ -293,24 +281,76 @@ export default function Home() {
                     </Center>
                   </Box>
                   <Box>
+                    
+                  <HStack spacing='24px' >
+                  <Box  w='60%' align="right">
+                  <Text fontSize='50px' color="black"  fontFamily="alice">{winningAmoutMessage}</Text>
+                  </Box>
+                  <Box w='50%'  >
+                  <Image width="128" height="128" src='/matic.png' alt='Shifumi' />
+                  </Box>
+
+                </HStack>
+                  </Box>
+                  <Box>
                     <Center>
                       <Button width="20%" colorScheme='blue'>Heads to win matic</Button>
                     </Center> 
                   </Box>
                 </VStack>
+              </Stack>
+            </CardBody>
+          </Card>
 
-                
+         </GridItem>
+         <GridItem rowSpan={1} colSpan={1} >
+         <Card height="100%" >
+            <CardBody>
+              <Stack divider={<StackDivider />} spacing='4'>
+                <Box>
+                <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
+                    BET COINS
+                  </Heading>
+                  <br></br>
+                </Box>
 
-                
-                          
-                  
-                  
-
-
+                <TableContainer>
+  <Table variant='simple'>
+    <TableCaption>Select your coin</TableCaption>
+    <Thead>
+      <Tr>
+        <Th></Th>
+        <Th>Coins</Th>
+        <Th isNumeric>Your balance</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      <Tr height="5px">
+        <Td><Image width="48" height="48" src='/matic_balance.png' alt='Shifumi' /></Td>
+        <Td>MATIC</Td>
+        <Td isNumeric>25.4</Td>
+      </Tr>
+      <Tr>
+        <Td><Image width="48" height="48" src='/ethereum_balance.png' alt='Shifumi' /></Td>
+        <Td>ETH</Td>
+        <Td isNumeric>30.48</Td>
+      </Tr>
+      <Tr>
+        <Td><Image width="48" height="48" src='/usdc_balance.png' alt='Shifumi' /></Td>
+        <Td>USDC</Td>
+        <Td isNumeric>307.12</Td>
+      </Tr>
+    </Tbody>
+  </Table>
+</TableContainer>
                 
               </Stack>
             </CardBody>
           </Card>
+
+         </GridItem>
+      </Grid>
+          
           <br></br>
           <Card >
             <CardBody>
@@ -321,17 +361,43 @@ export default function Home() {
                   </Heading>
                   <br></br>
                 </Box>
-                <Center h='100px' color='white'>
-                <RadioGroup defaultValue='2'>
-                      <Stack spacing={5} direction='row'>
-                        <Radio colorScheme='red' value='1' color="black">
-                        <Text fontSize='md' fontFamily="alice" color="black">Heads</Text>
-                        </Radio>
-                        <Radio colorScheme='green' value='2'>
-                        <Text fontSize='md' fontFamily="alice" color="black">Tails</Text>
-                        </Radio>
-                      </Stack>
-                    </RadioGroup>
+                <Center color='black'>
+                <TableContainer>
+  <Table variant='simple'>
+    <TableCaption>Imperial to metric conversion factors</TableCaption>
+    <Thead>
+      <Tr>
+        <Th>To convert</Th>
+        <Th>into</Th>
+        <Th isNumeric>multiply by</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      <Tr>
+        <Td>inches</Td>
+        <Td>millimetres (mm)</Td>
+        <Td isNumeric>25.4</Td>
+      </Tr>
+      <Tr>
+        <Td>feet</Td>
+        <Td>centimetres (cm)</Td>
+        <Td isNumeric>30.48</Td>
+      </Tr>
+      <Tr>
+        <Td>yards</Td>
+        <Td>metres (m)</Td>
+        <Td isNumeric>0.91444</Td>
+      </Tr>
+    </Tbody>
+    <Tfoot>
+      <Tr>
+        <Th>To convert</Th>
+        <Th>into</Th>
+        <Th isNumeric>multiply by</Th>
+      </Tr>
+    </Tfoot>
+  </Table>
+</TableContainer>
                 </Center>
               </Stack>
             </CardBody>

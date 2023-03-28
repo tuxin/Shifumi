@@ -10,7 +10,8 @@ import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { hardhat } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider,extendTheme } from '@chakra-ui/react'
+import "@fontsource/alice"
 
 const { chains, provider } = configureChains(
   [hardhat],
@@ -31,9 +32,20 @@ const wagmiClient = createClient({
   provider
 })
 
+const theme = extendTheme({
+  styles: {
+    global: {
+      "body": {
+        backgroundColor: "#f5f8fe",
+        fontFamily:"alice",
+      },
+    },
+  },
+});
+
 export default function App({ Component, pageProps }) {
   return (
-    <ChakraProvider>
+    <ChakraProvider theme={theme}>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains} theme={darkTheme({
         fontStack: 'system',
