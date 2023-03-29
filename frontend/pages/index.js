@@ -23,24 +23,7 @@ export default function Home() {
     setWinningAmount(event.target.value);
   };
 
-  const [loader, setLoader] = useState(true);
-  const [accounts, setAccounts]=useState([]);
 
-  useEffect(() =>{
-    getAccounts();
-    setLoader(false);
-  },[])
-
-  async function getAccounts() {
-    if(typeof window.ethereum != 'undefined'){
-      let accounts = await window.ethereum.request({method:'eth_requestAccounts'});
-      setAccounts(accounts);
-    }
-  }
-
-  window.ethereum.addListener('connect',async(reponse) =>{
-    getAccounts();
-  })
 
   return (
     <>
@@ -119,16 +102,6 @@ export default function Home() {
       </Button>
         </GridItem>
 
-        
-
-
-        
-
-
-
-
-
-
       <GridItem colSpan={4} >
 
       <Grid 
@@ -145,14 +118,15 @@ export default function Home() {
               
           <Grid templateColumns='repeat(5, 1fr)' gap={4}>
         <GridItem colSpan={2} >
-          {!loader && 
-                                  accounts.lenght>0 ? 
-                                  <p>You are connected with this account</p>
-                                  :
-                                  <p>You are not connected with this account</p>
-        }
+          {isConnected ? (
+            <Text>Your Shifhumi balance :</Text>
+          ) : (
+            <Text></Text>
+          )}
         </GridItem>
-         <GridItem colStart={6} colEnd={6} align="right"><ConnectButton /></GridItem>
+         <GridItem colStart={6} colEnd={6} align="right">
+          <ConnectButton />
+         </GridItem>
           </Grid>
             </CardBody>
           </Card>
@@ -323,7 +297,12 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <Button width="30%" colorScheme='red'>Heads to win matic</Button>
+                    {isConnected ? (
+                    <Button width="30%" colorScheme='red'>Heads to win matic</Button>
+                  ) : (
+                    <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
+                  )}
+                      
                     </Center> 
                   </Box>
                 </VStack>
