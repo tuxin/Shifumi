@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "../node_modules/@openzeppelin/contracts/access/Ownable.sol";
+import "../node_modules/@openzeppelin/contracts/security/Pausable.sol";
+import "../node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract Shifumi is Ownable {   
+
+contract BankShifumi is Ownable {   
     
     uint8 public limitRedistribution; 
     uint public limitBet; 

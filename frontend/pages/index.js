@@ -8,21 +8,39 @@ import { Input } from '@chakra-ui/react'
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 
-import React, { useState } from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
 
 export default function Home() {
 
   const { address, isConnected } = useAccount()
   const { colorMode, toggleColorMode } = useColorMode()
   const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
-
   const handleWinningAmountChange  = (event) => {
     setWinningAmount(event.target.value);
   };
 
-  
- 
+  const [loader, setLoader] = useState(true);
+  const [accounts, setAccounts]=useState([]);
+
+  useEffect(() =>{
+    getAccounts();
+    setLoader(false);
+  },[])
+
+  async function getAccounts() {
+    if(typeof window.ethereum != 'undefined'){
+      let accounts = await window.ethereum.request({method:'eth_requestAccounts'});
+      setAccounts(accounts);
+    }
+  }
+
+  window.ethereum.addListener('connect',async(reponse) =>{
+    getAccounts();
+  })
 
   return (
     <>
@@ -123,12 +141,24 @@ export default function Home() {
         <GridItem rowSpan={1} colSpan={4}  >
           <Card>
             <CardBody>
-              Barre de connexion et autre
+              
+              
+          <Grid templateColumns='repeat(5, 1fr)' gap={4}>
+        <GridItem colSpan={2} >
+          {!loader && 
+                                  accounts.lenght>0 ? 
+                                  <p>You are connected with this account</p>
+                                  :
+                                  <p>You are not connected with this account</p>
+        }
+        </GridItem>
+         <GridItem colStart={6} colEnd={6} align="right"><ConnectButton /></GridItem>
+          </Grid>
             </CardBody>
           </Card>
         </GridItem>
         </Grid>
-<br></br>
+          <br></br>
       <Grid 
         width='100%'
         
@@ -363,36 +393,70 @@ export default function Home() {
                 <Center color='black'>
                 <TableContainer width="100%">
   <Table variant='simple' >
-    <TableCaption>Imperial to metric conversion factors</TableCaption>
     <Thead>
       <Tr>
-        <Th>To convert</Th>
-        <Th>into</Th>
-        <Th isNumeric>multiply by</Th>
+        <Th></Th>
+        <Th>Games</Th>
+        <Th isNumeric>Bet</Th>
+        <Th isNumeric>Multiplier</Th>
+        <Th>Choice</Th>
+        <Th>Result</Th>
+        <Th isNumeric>Payout</Th>
+        <Th>Coins</Th>
+        <Th isNumeric>Protocol fees</Th>
+        <Th>Date</Th>
       </Tr>
     </Thead>
     <Tbody>
       <Tr>
-        <Td>inches</Td>
-        <Td>millimetres (mm)</Td>
-        <Td isNumeric>25.4</Td>
+        <Td><CheckIcon color="green" /></Td>
+        <Td>Flip</Td>
+        <Td isNumeric>2</Td>
+        <Td isNumeric>1.97</Td>
+        <Td>Heads</Td>
+        <Td>Heads</Td>
+        <Td isNumeric>3.94</Td>
+        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
+        <Td isNumeric>0.06</Td>
+        <Td>2023-03-29 11:47:00</Td>
       </Tr>
       <Tr>
-        <Td>feet</Td>
-        <Td>centimetres (cm)</Td>
-        <Td isNumeric>30.48</Td>
+        <Td><CloseIcon color="red" /></Td>
+        <Td>Flip</Td>
+        <Td isNumeric>2</Td>
+        <Td isNumeric>1.97</Td>
+        <Td>Heads</Td>
+        <Td>Heads</Td>
+        <Td isNumeric>0</Td>
+        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
+        <Td isNumeric>0.06</Td>
+        <Td>2023-03-29 11:47:00</Td>
       </Tr>
       <Tr>
-        <Td>yards</Td>
-        <Td>metres (m)</Td>
-        <Td isNumeric>0.91444</Td>
+        <Td><CheckIcon color="green" /></Td>
+        <Td>Flip</Td>
+        <Td isNumeric>2</Td>
+        <Td isNumeric>1.97</Td>
+        <Td>Heads</Td>
+        <Td>Heads</Td>
+        <Td isNumeric>3.94</Td>
+        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
+        <Td isNumeric>0.06</Td>
+        <Td>2023-03-29 11:47:00</Td>
       </Tr>
     </Tbody>
     <Tfoot>
       <Tr>
-        <Th>To convert</Th>
-        <Th>into</Th>
-        <Th isNumeric>multiply by</Th>
+        <Th></Th>
+        <Th>Games</Th>
+        <Th isNumeric>Bet</Th>
+        <Th isNumeric>Multiplier</Th>
+        <Th>Choice</Th>
+        <Th>Result</Th>
+        <Th isNumeric>Payout</Th>
+        <Th>Coins</Th>
+        <Th isNumeric>Protocol fees</Th>
+        <Th>Date</Th>
       </Tr>
     </Tfoot>
   </Table>
