@@ -63,7 +63,7 @@ export default function Home() {
                 </Box>
                 <Box>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                    <a href="/coinflip">Coin Flip</a> 
+                    Coin Flip
                   </Text>
                 </Box>
                 <Box>
@@ -260,7 +260,7 @@ export default function Home() {
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
                 <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    Shifumi
+                    Coin Flip
                   </Heading>
                   <br></br>
                 </Box>
@@ -277,12 +277,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <SimpleGrid f columns={3} spacing={1}>
-                      <Box><Image width="180" height="180" src='/rock.png' alt='Shifumi' /></Box>
-                      <Box><Image width="180" height="180" src='/leaf.png' alt='Shifumi' /></Box>
-                      <Box><Image width="180" height="180" src='/scissors.png' alt='Shifumi' /></Box>
-                      </SimpleGrid>
-  
+                      <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
                     </Center>
                   </Box>
                   <Box>
