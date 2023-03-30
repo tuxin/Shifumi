@@ -68,7 +68,7 @@ export default function Home() {
                 </Box>
                 <Box>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                    Roulette
+                    Roulette (Soon)
                   </Text>
                 </Box>
                 

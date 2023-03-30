@@ -68,7 +68,7 @@ export default function Home() {
                 </Box>
                 <Box>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                    Roulette
+                    Roulette (Soon)
                   </Text>
                 </Box>
                 
@@ -269,7 +269,48 @@ export default function Home() {
                   spacing={2}
                   align='stretch'
                 >
-                  
+                  <Box>
+                    <Center>
+                      <Text fontSize="20" fontFamily="Archivo Black">Current game</Text>
+                    </Center>
+                  </Box>
+                  <Box>
+                    <Center>
+                    <TableContainer>
+  <Table variant='simple'>
+    <Thead>
+      <Tr>
+        <Th>Game</Th>
+        <Th>You</Th>
+        <Th>Opponent</Th>
+        <Th>Result</Th>
+      </Tr>
+    </Thead>
+    <Tbody>
+      <Tr height="5px">
+        <Td>#1</Td>
+        <Td>Rock</Td>
+        <Td>Leaf</Td>
+        <Td><CloseIcon color="red" /></Td>
+      </Tr>
+      <Tr height="5px">
+        <Td>#2</Td>
+        <Td>Scissors</Td>
+        <Td>Leaf</Td>
+        <Td><CheckIcon color="green" /></Td>
+      </Tr>
+      <Tr height="5px">
+        <Td>#3</Td>
+        <Td>Rock</Td>
+        <Td>Scissors</Td>
+        <Td><CheckIcon color="green" /></Td>
+      </Tr>
+    </Tbody>
+  </Table>
+</TableContainer>
+  
+                    </Center>
+                  </Box>
                   <Box>
                     <Center>
                       <Text fontSize="50" fontFamily="Archivo Black">X 1,97</Text>
