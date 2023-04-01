@@ -2,13 +2,13 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const BankShifumi = await hre.ethers.getContractFactory("BankShifumi");
-  const bankShifumi = await BankShifumi.deploy("10");
+  const CoinFlip = await hre.ethers.getContractFactory("CoinFlip");
+  const coinFlip = await CoinFlip.deploy();
 
-  await bankShifumi.deployed();
+  await coinFlip.deployed();
 
   console.log(
-    `BankShifumi deployed to ${bankShifumi.address}`
+    `CoinFlip deployed to ${coinFlip.address}`
   );
 }
 

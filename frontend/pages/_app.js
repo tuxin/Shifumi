@@ -7,14 +7,14 @@ import {
   darkTheme ,
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
-import { hardhat } from 'wagmi/chains';
+import { hardhat, polygonMumbai } from 'wagmi/chains';
 import { alchemyProvider } from 'wagmi/providers/alchemy';
 import { publicProvider } from 'wagmi/providers/public';
 import { ChakraProvider,extendTheme } from '@chakra-ui/react'
 import "@fontsource/alice"
 
 const { chains, provider } = configureChains(
-  [hardhat],
+  [hardhat,polygonMumbai],
   [
     //alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
     publicProvider()
