@@ -5,24 +5,51 @@ import { useAccount, useProvider, useSigner } from 'wagmi'
 import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
 import { Input } from '@chakra-ui/react'
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
-
+import { ethers } from 'ethers'
+import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
+import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
+import { abiERC20 } from "../public/contracts/ConstantsERC20.js"
 
 import React, { useEffect, useState } from 'react';
 import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
 
 export default function Home() {
 
+  
   const { address, isConnected } = useAccount()
+  const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
   const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
+  const [multiplicator, setMultiplicator] = useState(null)
   const handleWinningAmountChange  = (event) => {
     setWinningAmount(event.target.value);
   };
 
+  useEffect(()=> {
+      if(isConnected){
+        getDatas()
+      }
+  },[address])
+
+  
+  const getDatas = async() => {
+    const contract = new ethers.Contract(contractAddress,abi,provider)
+
+    //Find the multiplicator
+    let multiplicatorvalue = await contract.getMultiplicator([1])
+    multiplicatorvalue= multiplicatorvalue/10
+    setMultiplicator(multiplicatorvalue.toString())
+
+    const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
+    console.log(await contractBank.getAllowToken())
+
+  
+    console.log(await contractBank.getBalanceAllowToken("0x617637D6E99AdFc4b9417A35B3dC9b48a1492FcE","0x326C977E6efc84E512bB9C30f76E30c160eD06FB"))
+  }
 
 
   return (
@@ -272,7 +299,7 @@ export default function Home() {
                   
                   <Box>
                     <Center>
-                      <Text fontSize="50" fontFamily="Archivo Black">X 1,97</Text>
+                      <Text fontSize="50" fontFamily="Archivo Black">X {multiplicator}</Text>
                     </Center>
                   </Box>
                   <Box>

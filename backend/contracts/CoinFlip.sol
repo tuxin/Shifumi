@@ -14,10 +14,12 @@ contract CoinFlip is Ownable,Pausable  {
 
     address bankAddress;
     uint8 multiplicator;
+    uint8 randomNumer;
 
     constructor(address _address) {
         bankAddress=_address;
         multiplicator=18;
+        randomNumer=1;
     }
 
     // ** SETTER ** //
@@ -25,8 +27,16 @@ contract CoinFlip is Ownable,Pausable  {
     /// @dev Set the multiplicator in uint8 >0
     /// @param _multiplicator in uint8 >0
     function setMultiplicator(uint8 _multiplicator) external onlyOwner{
-        require(_multiplicator>0, "This limit is not allowed");
+        require(_multiplicator>0, "This number is not allowed");
         multiplicator = _multiplicator ; 
+    }
+
+    /// @notice Set the random number
+    /// @dev Set how many random number we need in uint8 >0
+    /// @param _randomNumer in uint8 >0
+    function setRandomNumber(uint8 _randomNumer) external onlyOwner{
+        require(randomNumer>0, "This number is not allowed");
+        randomNumer = _randomNumer ; 
     }
 
     // ** GETTER ** //
@@ -37,6 +47,14 @@ contract CoinFlip is Ownable,Pausable  {
     function getMultiplicator(uint8[] memory _numbers) public view returns (uint){
         return multiplicator;
     }
+
+    /// @notice get the number of random number
+    /// @dev get an uint. 
+    /// @return multiplicator have many random number
+    function getRandomNumber() public view returns (uint){
+        return randomNumer;
+    }
+
 
     // MAIN
     /// @notice Pause or unpause the contract

@@ -81,9 +81,19 @@ describe("Deployed BankShifumi", function () {
       await expect(bankShifumi.connect(otherAccount).setBetLimit(12)).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
-    it('CoinFlip: Should not in pause other', async () => {
+    it('CoinFlip: Should not in pause by other account', async () => {
       const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
       await expect(coinFlip.connect(otherAccount).pause()).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it('CoinFlip: Should not change multiplicator by other account', async () => {
+      const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await expect(coinFlip.connect(otherAccount).setMultiplicator(2)).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it('CoinFlip: Should not change how many random number by other account', async () => {
+      const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await expect(coinFlip.connect(otherAccount).setRandomNumber(2)).to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 
@@ -136,6 +146,13 @@ describe("Deployed BankShifumi", function () {
   });
 
   describe("Require setBetLimit", function () {
+    it('BankShifumi: Should setBetLimit', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      const newLimit = 50;
+      await bankShifumi.setBetLimit(newLimit);
+      expect(await bankShifumi.getBetLimit()).to.equal(newLimit);
+    });
+
     it('BankShifumi: Should setBetLimit not lower to 1', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       const newLimitLower = 0;
@@ -150,6 +167,12 @@ describe("Deployed BankShifumi", function () {
   });
 
   describe("Require setWhitelistToken", function () {
+    it('BankShifumi: Should setWhitelistToken ', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await bankShifumi.setWhitelistToken("0x5FbDB2315678afecb367f032d93F642f64180aa3",true);
+      expect(await bankShifumi.getWhitelistToken("0x5FbDB2315678afecb367f032d93F642f64180aa3")).to.equal(true);
+    });
+
     it('BankShifumi: Should setWhitelistToken not address 0', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       await expect(bankShifumi.setWhitelistToken(ethers.constants.AddressZero,true)).to.be.revertedWith("This address is not allowed");
@@ -157,6 +180,12 @@ describe("Deployed BankShifumi", function () {
   });
 
   describe("Require setWhitelistGame", function () {
+    it('BankShifumi: Should setWhitelistGame ', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true);
+      expect(await bankShifumi.getWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3")).to.equal(true);
+    });
+
     it('BankShifumi: Should setWhitelistGame not address 0', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       await expect(bankShifumi.setWhitelistGame(ethers.constants.AddressZero,true)).to.be.revertedWith("This address is not allowed");

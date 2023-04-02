@@ -2,14 +2,16 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const CoinFlip = await hre.ethers.getContractFactory("CoinFlip");
-  const coinFlip = await CoinFlip.deploy("0xAFF5e4456719DB7cf31e21254D9A49aaf5E48Ed8");
+  const Crowdsale = await hre.ethers.getContractFactory("Crowdsale");
+  const crowdsale = await Crowdsale.deploy(1000000000000);
 
-  await coinFlip.deployed();
+  await crowdsale.deployed();
 
   console.log(
-    `CoinFlip deployed to ${coinFlip.address}`
+    `CoinFlip deployed to ${crowdsale.address}`
   );
+
+  console.log(await crowdsale.token.name);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -9,21 +9,35 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 
 interface IDataInterfaceGame {
   function getMultiplicator(uint8[] memory _numbers) external pure returns(uint);
+  function getRandomNumber() external pure returns(uint);
 }
 
 contract BankShifumi is Ownable,Pausable  {   
     
     uint8 public betLimit; 
 
+    address[] arrayWhiteListToken;
+
+    struct AllBalances {
+        uint balance;
+        address token;
+        string name;
+    }
+
     mapping(address=> bool) public whitelistToken; 
     mapping(address=> bool) public whitelistGame; 
+
+
 
     constructor(uint8 _betlimit) {
         betLimit=_betlimit;
         whitelistToken[address(0)] = true;
+        arrayWhiteListToken.push(address(0));
     }
 
     // ** GETTER ** //
@@ -65,6 +79,17 @@ contract BankShifumi is Ownable,Pausable  {
     function setWhitelistToken(address _tokenAddress,bool _whitelist) external onlyOwner{
         require(_tokenAddress!=address(0), "This address is not allowed");
         whitelistToken[_tokenAddress] = _whitelist;
+
+        if(_whitelist){
+            arrayWhiteListToken.push(_tokenAddress);
+        }else{
+            for (uint256 i = 0; i < arrayWhiteListToken.length; i++) {
+                if (arrayWhiteListToken[i] == _tokenAddress) {
+                    arrayWhiteListToken[i] = arrayWhiteListToken[arrayWhiteListToken.length - 1];
+                    arrayWhiteListToken.pop();
+                }
+            }
+        }
     }
 
     /// @notice Allow or not a game contract address to be use
@@ -95,7 +120,21 @@ contract BankShifumi is Ownable,Pausable  {
         require(_amount>0,"This amount is not allowed");
         require(_numbers.length>0,"Empty numbers array");
         require(IDataInterfaceGame(_gameContract).getMultiplicator(_numbers)>0,"Multiplicator is not valid");
-        
+        require(IDataInterfaceGame(_gameContract).getRandomNumber()>0,"Multiplicator is not valid");
+    }
+
+    /// @notice Return the all whitelist token
+    /// @dev return an array of allow token
+    /// returns address of token
+    function getAllowToken() external view returns (address[] memory){
+        return arrayWhiteListToken;
+    }
+
+    /// @notice Return the balance for this token
+    /// @dev return an uint balance
+    /// returns uint
+    function getBalanceAllowToken(address _token,address _address) external view returns (uint){
+        return IERC20(_token).balanceOf(address(_address));
     }
 
 }
