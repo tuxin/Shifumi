@@ -10,6 +10,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 
 interface IDataInterfaceGame {
@@ -21,12 +22,13 @@ contract BankShifumi is Ownable,Pausable  {
     
     uint8 public betLimit; 
 
+    string public gasToken;
+
     address[] arrayWhiteListToken;
 
-    struct AllBalances {
-        uint balance;
-        address token;
+    struct TokenInformation {
         string name;
+        uint balance; 
     }
 
     mapping(address=> bool) public whitelistToken; 
@@ -34,7 +36,8 @@ contract BankShifumi is Ownable,Pausable  {
 
 
 
-    constructor(uint8 _betlimit) {
+    constructor(string memory _gasToken,uint8 _betlimit) {
+        gasToken=_gasToken;
         betLimit=_betlimit;
         whitelistToken[address(0)] = true;
         arrayWhiteListToken.push(address(0));
@@ -130,11 +133,24 @@ contract BankShifumi is Ownable,Pausable  {
         return arrayWhiteListToken;
     }
 
-    /// @notice Return the balance for this token
-    /// @dev return an uint balance
-    /// returns uint
-    function getBalanceAllowToken(address _token,address _address) external view returns (uint){
-        return IERC20(_token).balanceOf(address(_address));
-    }
+    /// @notice Return all balance for an address
+    /// @dev return struct TokenInformation
+    /// returns TokenInformation
+    function getBalanceAllowTokens(address _address) public view returns (string[] memory, uint[] memory){
+        string[] memory names = new string[](arrayWhiteListToken.length);
+        uint[]   memory balances = new uint[](arrayWhiteListToken.length);
+        
+        for (uint i = 0; i < arrayWhiteListToken.length; i++) {  
+          if(arrayWhiteListToken[i]==address(0)){
+            names[i] = gasToken;
+            balances[i] = _address.balance;
+            
+          }else{
+            names[i] = IERC20Metadata(arrayWhiteListToken[i]).name();
+            balances[i] = IERC20(arrayWhiteListToken[i]).balanceOf(address(_address));
+          }
+        }
 
+        return (names, balances);
+    }
 }

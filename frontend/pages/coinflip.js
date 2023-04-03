@@ -1,6 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
+import TokenAllow from '@/components/TokenAllow/TokenAllow'
+
 import { useAccount, useProvider, useSigner } from 'wagmi'
 import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
@@ -37,18 +39,21 @@ export default function Home() {
 
   
   const getDatas = async() => {
-    const contract = new ethers.Contract(contractAddress,abi,provider)
+    //const contract = new ethers.Contract(contractAddress,abi,provider)
 
     //Find the multiplicator
-    let multiplicatorvalue = await contract.getMultiplicator([1])
-    multiplicatorvalue= multiplicatorvalue/10
-    setMultiplicator(multiplicatorvalue.toString())
+    //let multiplicatorvalue = await contract.getMultiplicator([1])
+    //multiplicatorvalue= multiplicatorvalue/10
+    //setMultiplicator(multiplicatorvalue.toString())
 
     const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
-    console.log(await contractBank.getAllowToken())
-
-  
-    console.log(await contractBank.getBalanceAllowToken("0x617637D6E99AdFc4b9417A35B3dC9b48a1492FcE","0x326C977E6efc84E512bB9C30f76E30c160eD06FB"))
+   
+    
+    provider.getBalance(address).then((balance) => {
+      // convert a currency unit from wei to ether
+      const balanceInEth = ethers.utils.formatEther(balance)
+      console.log(`balance: ${balanceInEth} ETH`)
+     })
   }
 
 
@@ -349,35 +354,7 @@ export default function Home() {
                   <br></br>
                 </Box>
 
-                <TableContainer>
-  <Table variant='simple'>
-    <TableCaption>Select your coin</TableCaption>
-    <Thead>
-      <Tr>
-        <Th></Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Your balance</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      <Tr height="5px">
-        <Td><Image width="48" height="48" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td>MATIC</Td>
-        <Td isNumeric>25.4</Td>
-      </Tr>
-      <Tr>
-        <Td><Image width="48" height="48" src='/ethereum_balance.png' alt='Shifumi' /></Td>
-        <Td>ETH</Td>
-        <Td isNumeric>30.48</Td>
-      </Tr>
-      <Tr>
-        <Td><Image width="48" height="48" src='/usdc_balance.png' alt='Shifumi' /></Td>
-        <Td>USDC</Td>
-        <Td isNumeric>307.12</Td>
-      </Tr>
-    </Tbody>
-  </Table>
-</TableContainer>
+               <TokenAllow />
                 
               </Stack>
             </CardBody>
