@@ -156,13 +156,28 @@ describe("Deployed BankShifumi", function () {
     it('BankShifumi: Should setBetLimit not lower to 1', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       const newLimitLower = 0;
-      await expect(bankShifumi.setBetLimit(newLimitLower)).to.be.revertedWith("This limit is not allowed");
+      await expect(bankShifumi.setBetLimit(newLimitLower)).to.be.revertedWith("This number is not allowed");
     });
 
     it('BankShifumi: Should setBetLimit not higher to 99', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       const newLimitHigher = 100;
-      await expect(bankShifumi.setBetLimit(newLimitHigher)).to.be.revertedWith("This limit is not allowed");
+      await expect(bankShifumi.setBetLimit(newLimitHigher)).to.be.revertedWith("This number is not allowed");
+    });
+  });
+
+  describe("Require setMultiplicator", function () {
+    it('BankShifumi: Should setMultiplicator', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      const newLimit = 50;
+      await bankShifumi.setMultiplicator(newLimit);
+      expect(await bankShifumi.getMultiplicator()).to.equal(newLimit);
+    });
+
+    it('BankShifumi: Should setMultiplicator not lower to 1', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      const newLimitLower = 0;
+      await expect(bankShifumi.setMultiplicator(newLimitLower)).to.be.revertedWith("This number is not allowed");
     });
   });
 

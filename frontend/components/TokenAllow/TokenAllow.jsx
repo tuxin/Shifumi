@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { useAccount, useProvider, useSigner } from 'wagmi'
-import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,useColorMode} from '@chakra-ui/react'
+import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Text} from '@chakra-ui/react'
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { ethers } from 'ethers'
@@ -12,9 +12,6 @@ const TokenAllow = () => {
   
   const { address, isConnected } = useAccount()
   const  provider  = useProvider()
-  const { colorMode, toggleColorMode } = useColorMode()
-  const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
-  const [multiplicator, setMultiplicator] = useState(null)
   const [allowtoken, setListeAllowToken] = useState(null)
   const handleWinningAmountChange  = (event) => {
     setWinningAmount(event.target.value);
@@ -26,35 +23,31 @@ const TokenAllow = () => {
       }
   },[address])
 
+  const setSelectedRow  = (name) => {
+    console.log(name)
+    document.getElementById("buttonconnect").innerHTML="Heads to win "+name
+  };
+ 
+  
   
   const getDatas = async() => {
     const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
     const arrayAllowToken = await contractBank.getBalanceAllowTokens(address)
       
     const tableallowtoken= arrayAllowToken.map((allowTokens,index) =>   
-        <Tr height="5px">
-        <Td><Image width="48" height="48" src={`/tokenwhitelist//${arrayAllowToken[0][index]}.png`} alt='Shifumi' /></Td>
+        <Tr key={index} onClick={() => setSelectedRow(arrayAllowToken[0][index])}>
+        <Td><Image width="48" height="48" src={`/tokenwhitelist/${arrayAllowToken[0][index]}.png`} alt='Shifumi' /></Td>
         <Td>{arrayAllowToken[0][index]}</Td>
         <Td isNumeric>{ethers.utils.formatEther(arrayAllowToken[1][index])}</Td>
         </Tr>
     );
     setListeAllowToken(tableallowtoken)
-
-
-    
-    provider.getBalance(address).then((balance) => {
-      // convert a currency unit from wei to ether
-      const balanceInEth = ethers.utils.formatEther(balance)
-      console.log(`balance: ${balanceInEth} ETH`)
-     })
   }
-
-
   return (
     <>
     <TableContainer>
         <Table variant='simple'>
-            <TableCaption>Select your coin</TableCaption>
+            <TableCaption>{isConnected ? (<Text>Select your coin</Text>) : (<Text>Please connect your wallet</Text>)}</TableCaption>
             <Thead>
             <Tr>
                 <Th></Th>
@@ -62,25 +55,7 @@ const TokenAllow = () => {
                 <Th isNumeric>Your balance</Th>
             </Tr>
             </Thead>
-            <Tbody>
-           {allowtoken}
-                
-            <Tr height="5px">
-                <Td><Image width="48" height="48" src='/matic_balance.png' alt='Shifumi' /></Td>
-                <Td>MATIC</Td>
-                <Td isNumeric>25.4</Td>
-            </Tr>
-            <Tr>
-                <Td><Image width="48" height="48" src='/ethereum_balance.png' alt='Shifumi' /></Td>
-                <Td>ETH</Td>
-                <Td isNumeric>30.48</Td>
-            </Tr>
-            <Tr>
-                <Td><Image width="48" height="48" src='/usdc_balance.png' alt='Shifumi' /></Td>
-                <Td>USDC</Td>
-                <Td isNumeric>307.12</Td>
-            </Tr>
-            </Tbody>
+            <Tbody>{allowtoken}</Tbody>
         </Table>
         </TableContainer>
     </>

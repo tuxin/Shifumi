@@ -39,21 +39,12 @@ export default function Home() {
 
   
   const getDatas = async() => {
-    //const contract = new ethers.Contract(contractAddress,abi,provider)
+    const contract = new ethers.Contract(contractAddress,abi,provider)
 
     //Find the multiplicator
-    //let multiplicatorvalue = await contract.getMultiplicator([1])
-    //multiplicatorvalue= multiplicatorvalue/10
-    //setMultiplicator(multiplicatorvalue.toString())
-
-    const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
-   
-    
-    provider.getBalance(address).then((balance) => {
-      // convert a currency unit from wei to ether
-      const balanceInEth = ethers.utils.formatEther(balance)
-      console.log(`balance: ${balanceInEth} ETH`)
-     })
+    let multiplicatorvalue = await contract.getMultiplicator([1])
+    multiplicatorvalue= multiplicatorvalue/10
+    setMultiplicator(multiplicatorvalue.toString())
   }
 
 
@@ -330,7 +321,7 @@ export default function Home() {
                   <Box>
                     <Center>
                     {isConnected ? (
-                    <Button width="30%" colorScheme='red'>Heads to win matic</Button>
+                    <Button width="30%" colorScheme='red' id="buttonconnect">Heads to win matic</Button>
                   ) : (
                     <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
                   )}
