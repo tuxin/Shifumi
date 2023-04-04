@@ -2,16 +2,16 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const BankShifumi = await hre.ethers.getContractFactory("BankShifumi");
-  const bankShifumi = await BankShifumi.deploy("ETH","10");
+  const ERC20Token = await hre.ethers.getContractFactory("ERC20Token");
+  const eRC20Token = await ERC20Token.deploy(10000000000000);
 
-  await bankShifumi.deployed();
+  await eRC20Token.deployed();
 
   console.log(
-    `BankShifumi deployed to ${bankShifumi.address}`
+    `eRC20Token deployed to ${eRC20Token.address}`
   );
 
-  await bankShifumi.setWhitelistToken("0x5FbDB2315678afecb367f032d93F642f64180aa3",true);
+  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

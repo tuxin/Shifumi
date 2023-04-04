@@ -16,10 +16,10 @@ describe("Deployed BankShifumi", function () {
     const [owner, otherAccount] = await ethers.getSigners();
 
     const BankShifumi = await ethers.getContractFactory("BankShifumi");
-    const bankShifumi = await BankShifumi.deploy(betLimit);
+    const bankShifumi = await BankShifumi.deploy("ETH",betLimit);
 
     const CoinFlip = await ethers.getContractFactory("CoinFlip");
-    const coinFlip = await CoinFlip.deploy(bankShifumi.address);
+    const coinFlip = await CoinFlip.deploy(bankShifumi.address,18,1,"CoinFlip");
 
     //console.log(await bankShifumi.test(coinFlip.address,[1]));
 
@@ -229,6 +229,16 @@ describe("Deployed BankShifumi", function () {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true); //Allow game contract
       await expect(bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[])).to.be.revertedWith("Empty numbers array");
+    });
+    
+  });
+
+  describe("BankShifumi: Bet event", function () {
+    it('BankShifumi: Should array is allow', async () => {
+      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true); //Allow game contract
+      await bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[1]);
+     
     });
   });
 

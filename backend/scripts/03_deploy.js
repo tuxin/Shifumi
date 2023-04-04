@@ -2,16 +2,14 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const ERC20Token = await hre.ethers.getContractFactory("ERC20Token");
-  const eRC20Token = await ERC20Token.deploy(10000000000000);
+  const CoinFlip = await hre.ethers.getContractFactory("CoinFlip");
+  const coinFlip = await CoinFlip.deploy("0x851356ae760d987E095750cCeb3bC6014560891C",18,1,"CoinFlip");
 
-  await eRC20Token.deployed();
+  await coinFlip.deployed();
 
   console.log(
-    `eRC20Token deployed to ${eRC20Token.address}`
+    `CoinFlip deployed to ${coinFlip.address}`
   );
-
-  
 }
 
 // We recommend this pattern to be able to use async/await everywhere

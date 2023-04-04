@@ -14,14 +14,14 @@ import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import { ethers } from 'ethers'
 import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
 import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
-import { abiERC20 } from "../public/contracts/ConstantsERC20.js"
 
 import React, { useEffect, useState } from 'react';
 import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
 
 export default function Home() {
-
   
+
+  const { data: signer } = useSigner()
   const { address, isConnected } = useAccount()
   const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
@@ -37,7 +37,18 @@ export default function Home() {
       }
   },[address])
 
-  
+ 
+  const contractev = new ethers.Contract(contractAddressBank, abiBank, provider);
+  contractev.on("Bet", (from, to, value, event)=>{
+      let transferEvent ={
+          from: from,
+          to: to,
+          value: value,
+          eventData: event,
+      }
+      document.getElementById("inputvaluebet").value=9999
+  })
+
   const getDatas = async() => {
     const contract = new ethers.Contract(contractAddress,abi,provider)
 
@@ -47,6 +58,22 @@ export default function Home() {
     setMultiplicator(multiplicatorvalue.toString())
   }
 
+  const setTheBet = async() => {
+    try {
+        const contract = new ethers.Contract(contractAddressBank, abiBank, signer)
+        if(contractAddress,document.getElementById("inputaddress").value==ethers.constants.AddressZero){
+          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1],{ value: ethers.utils.parseUnits("1", "ether") })
+        }else{
+          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1])
+        }
+        await transaction.wait()
+        router.push('/coinflip')
+        console.log("Success")
+    }
+    catch(e) {
+        console.log(e)
+    }
+  }
 
   return (
     <>
@@ -305,7 +332,7 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>                  
-                      <Input width="30%" placeholder='Amount' type='number' align="center" onChange={handleWinningAmountChange}/>
+                      <Input width="30%" placeholder='Amount' type='number' align="center" id="inputvaluebet" onChange={handleWinningAmountChange}/>
                     </Center> 
                   </Box>
                   <Box>
@@ -321,11 +348,12 @@ export default function Home() {
                   <Box>
                     <Center>
                     {isConnected ? (
-                    <Button width="30%" colorScheme='red' id="buttonconnect">Heads to win matic</Button>
+                    <Button width="30%" colorScheme='red' id="buttonconnect" onClick={() => setTheBet()}>Heads to win matic</Button>
+                    
                   ) : (
                     <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
                   )}
-                      
+                      <Input type="hidden" id="inputaddress" />
                     </Center> 
                   </Box>
                 </VStack>

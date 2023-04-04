@@ -11,11 +11,13 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 
 
 interface IDataInterfaceGame {
   function getMultiplicator(uint8[] memory _numbers) external pure returns(uint);
   function getRandomNumber() external pure returns(uint);
+  function getGameName() external pure returns(string memory);
 }
 
 contract BankShifumi is Ownable,Pausable  {   
@@ -34,7 +36,7 @@ contract BankShifumi is Ownable,Pausable  {
     mapping(address=> bool) public whitelistToken; 
     mapping(address=> bool) public whitelistGame; 
 
-
+    Counters.Counter private gameId;
 
     constructor(string memory _gasToken,uint8 _betlimit) {
         gasToken=_gasToken;
@@ -42,6 +44,9 @@ contract BankShifumi is Ownable,Pausable  {
         whitelistToken[address(0)] = true;
         arrayWhiteListToken.push(address(0));
     }
+
+    // ** EVENTS ** /
+    event Bet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers);
 
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
@@ -119,11 +124,14 @@ contract BankShifumi is Ownable,Pausable  {
     /// @param _token token address,_amount bet amount,_numbers array of numbers
     function bet(address _gameContract,address _token,uint256 _amount,uint8[] memory _numbers) payable external{
         require(getWhitelistToken(_token)==true, "This token is not allowed");
-        require(getWhitelistGame(_gameContract)==true, "This token is not allowed");
+        require(getWhitelistGame(_gameContract)==true, "This address is not allowed");
         require(_amount>0,"This amount is not allowed");
         require(_numbers.length>0,"Empty numbers array");
         require(IDataInterfaceGame(_gameContract).getMultiplicator(_numbers)>0,"Multiplicator is not valid");
         require(IDataInterfaceGame(_gameContract).getRandomNumber()>0,"Multiplicator is not valid");
+
+        
+        emit Bet(0,"TODO",msg.sender,_amount,_numbers);
     }
 
     /// @notice Return the all whitelist token
@@ -153,4 +161,10 @@ contract BankShifumi is Ownable,Pausable  {
 
         return (names, balances);
     }
+
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {}
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {}
 }

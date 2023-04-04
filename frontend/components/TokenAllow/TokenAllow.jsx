@@ -23,9 +23,9 @@ const TokenAllow = () => {
       }
   },[address])
 
-  const setSelectedRow  = (name) => {
-    console.log(name)
+  const setSelectedRow  = (name,addressToken) => {
     document.getElementById("buttonconnect").innerHTML="Heads to win "+name
+    document.getElementById("inputaddress").value=addressToken
   };
  
   
@@ -33,9 +33,9 @@ const TokenAllow = () => {
   const getDatas = async() => {
     const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
     const arrayAllowToken = await contractBank.getBalanceAllowTokens(address)
-      
+    const arrayToken = await contractBank.getAllowToken()
     const tableallowtoken= arrayAllowToken.map((allowTokens,index) =>   
-        <Tr key={index} onClick={() => setSelectedRow(arrayAllowToken[0][index])}>
+        <Tr key={index} onClick={() => setSelectedRow(arrayAllowToken[0][index],arrayToken[index])}>
         <Td><Image width="48" height="48" src={`/tokenwhitelist/${arrayAllowToken[0][index]}.png`} alt='Shifumi' /></Td>
         <Td>{arrayAllowToken[0][index]}</Td>
         <Td isNumeric>{ethers.utils.formatEther(arrayAllowToken[1][index])}</Td>

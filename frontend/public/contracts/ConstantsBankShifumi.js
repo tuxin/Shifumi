@@ -1,4 +1,4 @@
-export const contractAddressBank = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+export const contractAddressBank = "0x851356ae760d987E095750cCeb3bC6014560891C"
 export const abiBank = [
   {
     "inputs": [
@@ -15,6 +15,43 @@ export const abiBank = [
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_gameName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_account",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint8[]",
+        "name": "_numbers",
+        "type": "uint8[]"
+      }
+    ],
+    "name": "Bet",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -60,6 +97,10 @@ export const abiBank = [
     ],
     "name": "Unpaused",
     "type": "event"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "fallback"
   },
   {
     "inputs": [
@@ -342,5 +383,9 @@ export const abiBank = [
     ],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
   }
 ]
