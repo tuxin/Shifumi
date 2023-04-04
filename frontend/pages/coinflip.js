@@ -39,14 +39,16 @@ export default function Home() {
 
  
   const contractev = new ethers.Contract(contractAddressBank, abiBank, provider);
-  contractev.on("Bet", (from, to, value, event)=>{
+  contractev.on("Bet", (_id, _gameName, _account,_amount,_numbers, event)=>{
       let transferEvent ={
-          from: from,
-          to: to,
-          value: value,
+        _id: _id,
+        _gameName: _gameName,
+        _account: _account,
+        _amount: _amount,
+        _numbers:_numbers,
           eventData: event,
       }
-      document.getElementById("inputvaluebet").value=9999
+      console.log(transferEvent)
   })
 
   const getDatas = async() => {

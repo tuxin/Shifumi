@@ -3,7 +3,7 @@ const hre = require("hardhat");
 async function main() {
 
   const CoinFlip = await hre.ethers.getContractFactory("CoinFlip");
-  const coinFlip = await CoinFlip.deploy("0x851356ae760d987E095750cCeb3bC6014560891C",18,1,"CoinFlip");
+  const coinFlip = await CoinFlip.deploy("0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",18,1,"CoinFlip");
 
   await coinFlip.deployed();
 

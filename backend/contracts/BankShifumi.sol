@@ -152,7 +152,6 @@ contract BankShifumi is Ownable,Pausable  {
           if(arrayWhiteListToken[i]==address(0)){
             names[i] = gasToken;
             balances[i] = _address.balance;
-            
           }else{
             names[i] = IERC20Metadata(arrayWhiteListToken[i]).name();
             balances[i] = IERC20(arrayWhiteListToken[i]).balanceOf(address(_address));
