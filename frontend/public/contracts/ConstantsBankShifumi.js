@@ -1,4 +1,4 @@
-export const contractAddressBank = "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+export const contractAddressBank = "0xc3e53F4d16Ae77Db1c982e75a937B9f60FE63690"
 export const abiBank = [
   {
     "inputs": [
@@ -48,6 +48,24 @@ export const abiBank = [
         "internalType": "uint8[]",
         "name": "_numbers",
         "type": "uint8[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_multiplier",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_nameToken",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
       }
     ],
     "name": "Bet",

@@ -36,6 +36,7 @@ contract BankShifumi is Ownable,Pausable  {
     mapping(address=> bool) public whitelistToken; 
     mapping(address=> bool) public whitelistGame; 
 
+    using Counters for Counters.Counter;
     Counters.Counter private gameId;
 
     constructor(string memory _gasToken,uint8 _betlimit) {
@@ -46,7 +47,7 @@ contract BankShifumi is Ownable,Pausable  {
     }
 
     // ** EVENTS ** /
-    event Bet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers);
+    event Bet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
 
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
@@ -130,8 +131,19 @@ contract BankShifumi is Ownable,Pausable  {
         require(IDataInterfaceGame(_gameContract).getMultiplicator(_numbers)>0,"Multiplicator is not valid");
         require(IDataInterfaceGame(_gameContract).getRandomNumber()>0,"Multiplicator is not valid");
 
-        
-        emit Bet(0,"TODO",msg.sender,_amount,_numbers);
+        string memory nameToken;
+        uint256 multiplicator;
+
+        multiplicator=IDataInterfaceGame(_gameContract).getMultiplicator(_numbers);
+        gameId.increment();
+
+        if(_token==address(0)){
+            nameToken = gasToken;
+          }else{
+            nameToken = IERC20Metadata(_token).name();
+          }
+
+        emit Bet(gameId.current(),IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
     }
 
     /// @notice Return the all whitelist token

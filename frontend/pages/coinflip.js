@@ -2,7 +2,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
 import TokenAllow from '@/components/TokenAllow/TokenAllow'
-
+import ArrayResults from '@/components/ArrayResults/ArrayResults'
 import { useAccount, useProvider, useSigner } from 'wagmi'
 import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
@@ -10,13 +10,10 @@ import { Input } from '@chakra-ui/react'
 import { ConnectButton, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import { ethers } from 'ethers'
 import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
 import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
-
 import React, { useEffect, useState } from 'react';
-import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
 
 export default function Home() {
   
@@ -36,20 +33,6 @@ export default function Home() {
         getDatas()
       }
   },[address])
-
- 
-  const contractev = new ethers.Contract(contractAddressBank, abiBank, provider);
-  contractev.on("Bet", (_id, _gameName, _account,_amount,_numbers, event)=>{
-      let transferEvent ={
-        _id: _id,
-        _gameName: _gameName,
-        _account: _account,
-        _amount: _amount,
-        _numbers:_numbers,
-          eventData: event,
-      }
-      console.log(transferEvent)
-  })
 
   const getDatas = async() => {
     const contract = new ethers.Contract(contractAddress,abi,provider)
@@ -385,91 +368,8 @@ export default function Home() {
       </Grid>
           
           <br></br>
-          <Card >
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                <Box>
-                <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    Results
-                  </Heading>
-                  <br></br>
-                </Box>
-                <Center color='black'>
-                <TableContainer width="100%">
-  <Table variant='simple' >
-    <Thead>
-      <Tr>
-        <Th></Th>
-        <Th>Games</Th>
-        <Th isNumeric>Bet</Th>
-        <Th isNumeric>Multiplier</Th>
-        <Th>Choice</Th>
-        <Th>Result</Th>
-        <Th isNumeric>Payout</Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Protocol fees</Th>
-        <Th>Date</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      <Tr>
-        <Td><CheckIcon color="green" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>3.94</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-      <Tr>
-        <Td><CloseIcon color="red" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>0</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-      <Tr>
-        <Td><CheckIcon color="green" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>3.94</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-    </Tbody>
-    <Tfoot>
-      <Tr>
-        <Th></Th>
-        <Th>Games</Th>
-        <Th isNumeric>Bet</Th>
-        <Th isNumeric>Multiplier</Th>
-        <Th>Choice</Th>
-        <Th>Result</Th>
-        <Th isNumeric>Payout</Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Protocol fees</Th>
-        <Th>Date</Th>
-      </Tr>
-    </Tfoot>
-  </Table>
-</TableContainer>
-                </Center>
-              </Stack>
-            </CardBody>
-          </Card>
-
+          <ArrayResults />
+          
         </GridItem>
       </Grid>
       </Layout>
