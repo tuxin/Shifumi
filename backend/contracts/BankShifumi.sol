@@ -12,6 +12,11 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
+import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
+
+
 
 
 interface IDataInterfaceGame {
@@ -20,30 +25,47 @@ interface IDataInterfaceGame {
   function getGameName() external pure returns(string memory);
 }
 
-contract BankShifumi is Ownable,Pausable  {   
+contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {   
     
     uint8 public betLimit; 
+    uint16 requestConfirmations = 3;
+    uint32 callbackGasLimit = 100000;  //Chainlink
+    uint256 public lastRequestId; //Chainlink
 
     string public gasToken;
+    uint64 s_subscriptionId; //Chainlink Your subscription ID.
 
     address[] arrayWhiteListToken;
-
+    uint256[] public requestIds; //Chainlink
+    
+    bytes32 keyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;//Chainlink
     struct TokenInformation {
         string name;
         uint balance; 
     }
 
+    struct RequestStatus { //Chainlink
+        bool fulfilled; // whether the request has been successfully fulfilled
+        bool exists; // whether a requestId exists
+        uint256[] randomWords;
+    }
+
     mapping(address=> bool) public whitelistToken; 
     mapping(address=> bool) public whitelistGame; 
+    mapping(uint256 => RequestStatus) public s_requests; //Chainlink /* requestId --> requestStatus */
+
+    VRFCoordinatorV2Interface COORDINATOR; //For Chainlink
 
     using Counters for Counters.Counter;
     Counters.Counter private gameId;
 
-    constructor(string memory _gasToken,uint8 _betlimit) {
+    constructor(string memory _gasToken,uint8 _betlimit,uint64 subscriptionId) VRFConsumerBaseV2(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed) {
         gasToken=_gasToken;
         betLimit=_betlimit;
         whitelistToken[address(0)] = true;
         arrayWhiteListToken.push(address(0));
+        COORDINATOR = VRFCoordinatorV2Interface(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed);
+        s_subscriptionId = subscriptionId;
     }
 
     // ** EVENTS ** /
@@ -133,6 +155,7 @@ contract BankShifumi is Ownable,Pausable  {
 
         string memory nameToken;
         uint256 multiplicator;
+        uint requestId;
 
         multiplicator=IDataInterfaceGame(_gameContract).getMultiplicator(_numbers);
         gameId.increment();
@@ -143,7 +166,23 @@ contract BankShifumi is Ownable,Pausable  {
             nameToken = IERC20Metadata(_token).name();
           }
 
-        emit Bet(gameId.current(),IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
+        requestId = COORDINATOR.requestRandomWords(
+            keyHash,
+            s_subscriptionId,
+            requestConfirmations,
+            callbackGasLimit,
+            1
+        );
+        s_requests[requestId] = RequestStatus({
+            randomWords: new uint256[](0),
+            exists: true,
+            fulfilled: false
+        });
+        requestIds.push(requestId);
+        lastRequestId = requestId;
+
+        emit Bet(requestId,IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
+        //uint256 requestId = requestRandomWords();
     }
 
     /// @notice Return the all whitelist token
@@ -171,6 +210,26 @@ contract BankShifumi is Ownable,Pausable  {
         }
 
         return (names, balances);
+    }
+
+      
+
+    function fulfillRandomWords(
+        uint256 _requestId,
+        uint256[] memory _randomWords
+    ) internal override {
+        require(s_requests[_requestId].exists, "request not found");
+        s_requests[_requestId].fulfilled = true;
+        s_requests[_requestId].randomWords = _randomWords;
+    }
+
+    // to check the request status of random number call.
+    function getRequestStatus(
+        uint256 _requestId
+    ) external view returns (bool fulfilled, uint256[] memory randomWords) {
+        require(s_requests[_requestId].exists, "request not found");
+        RequestStatus memory request = s_requests[_requestId];
+        return (request.fulfilled, request.randomWords);
     }
 
     // Function to receive Ether. msg.data must be empty

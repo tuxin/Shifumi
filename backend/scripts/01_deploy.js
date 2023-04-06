@@ -3,8 +3,8 @@ const hre = require("hardhat");
 async function main() {
 
   const ERC20Token = await hre.ethers.getContractFactory("ERC20Token");
-  const eRC20Token = await ERC20Token.deploy(10000000000000);
-
+  const eRC20Token = await ERC20Token.deploy(hre.ethers.BigNumber.from("7777777000000000000000000"));
+  
   await eRC20Token.deployed();
 
   console.log(
