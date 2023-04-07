@@ -2,14 +2,16 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const CoinFlip = await hre.ethers.getContractFactory("CoinFlip");
-  const coinFlip = await CoinFlip.deploy("0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",18,1,"CoinFlip");
+  const contractName="StakingShifumi"
+  const bankAddress="0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  const erc20Address="0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
 
-  await coinFlip.deployed();
-
-  console.log(
-    `CoinFlip deployed to ${coinFlip.address}`
-  );
+  console.log(`------------`);
+  const StakingShifumi = await hre.ethers.getContractFactory(contractName);
+  const stakingShifumi = await StakingShifumi.deploy(bankAddress,erc20Address);
+  await stakingShifumi.deployed();
+  console.log(`stakingShifumi deployed to ${stakingShifumi.address}`);
+  console.log(`------------`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

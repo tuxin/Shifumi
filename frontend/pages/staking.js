@@ -15,7 +15,7 @@ import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
 import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
 import React, { useEffect, useState } from 'react';
 
-export default function Home() {
+export default function Staking() {
   
 
   const { data: signer } = useSigner()
@@ -300,7 +300,7 @@ export default function Home() {
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
                 <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    Coin Flip
+                    Stake and Unstake
                   </Heading>
                   <br></br>
                 </Box>
@@ -358,7 +358,7 @@ export default function Home() {
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
                 <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    BET COINS
+                    CURRENT STAKING
                   </Heading>
                   <br></br>
                 </Box>

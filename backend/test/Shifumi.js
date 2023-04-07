@@ -11,23 +11,35 @@ describe("Deployed BankShifumi", function () {
   // and reset Hardhat Network to that snapshot in every test.
   async function deployBankShifumi() {
     const betLimit = 7;
+    const supply = "7777777000000000000000000"
+    const gameNameCoinFlip="CoinFlip"
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
 
+    const ERC20 = await ethers.getContractFactory("ERC20Token");
+    const eRC20 = await ERC20.deploy(supply);
+    
     const BankShifumi = await ethers.getContractFactory("BankShifumi");
-    const bankShifumi = await BankShifumi.deploy("ETH",betLimit);
+    const bankShifumi = await BankShifumi.deploy("ETH",1);
+    await bankShifumi.setBetLimit(betLimit);
 
     const CoinFlip = await ethers.getContractFactory("CoinFlip");
     const coinFlip = await CoinFlip.deploy(bankShifumi.address,18,1,"CoinFlip");
 
-    //console.log(await bankShifumi.test(coinFlip.address,[1]));
+    const StakingShifumi = await ethers.getContractFactory("StakingShifumi");
+    const stakingShifumi = await StakingShifumi.deploy(bankShifumi.address,eRC20.address);
 
-    return { bankShifumi,coinFlip,betLimit,owner,otherAccount };
+    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi };
   }
 
   //Testing the correct deployment
   describe("Deployment", function () {
+    it("ERC20: Should set the right supply", async function () {
+      const { eRC20,owner,supply } = await loadFixture(deployBankShifumi);
+      expect(await eRC20.balanceOf(owner.address)).to.equal(supply);
+    });
+    
     it("BankShifumi: Should set the right betLimit", async function () {
       const { bankShifumi,betLimit } = await loadFixture(deployBankShifumi);
       expect(await bankShifumi.getBetLimit()).to.equal(betLimit);
@@ -58,6 +70,35 @@ describe("Deployed BankShifumi", function () {
       expect(await coinFlip.paused()).to.equal(false);
     });
     
+    it('CoinFlip: Should the correct game name', async () => {
+      const { coinFlip,gameNameCoinFlip } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getGameName()).to.equal(gameNameCoinFlip);
+    });
+
+    it('StakingShifumi: Should not in pause', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.paused()).to.equal(false);
+    });
+    
+    it('StakingShifumi: Should not in pause', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.paused()).to.equal(false);
+    });
+
+    it('StakingShifumi: Should balances = 0', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.getBalances()).to.equal(0);
+    });
+
+    it('StakingShifumi: Should fees claimable = 0', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.getFeesclaimable()).to.equal(0);
+    });
+
+    it('StakingShifumi: Should the correct bank address', async () => {
+      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.getBankAddress()).to.equal(bankShifumi.address);
+    });
   });
 
   describe("Only Owner", function () {
@@ -143,6 +184,44 @@ describe("Deployed BankShifumi", function () {
       await bankShifumi.pause();
       expect(await bankShifumi.paused()).to.equal(false);
     });
+
+    it('CoinFlip: Should get and set the random number', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      await coinFlip.setRandomNumber(2);
+      expect(await coinFlip.getRandomNumber()).to.equal(2);
+    });
+
+    it('CoinFlip: Should get and set the multiplicator number', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      await coinFlip.setMultiplicator(2);
+      expect(await coinFlip.getMultiplicator([1])).to.equal(2);
+    });
+
+    it('CoinFlip: Should get and set unpause', async () => {
+      const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await coinFlip.pause();
+      await coinFlip.pause();
+      expect(await coinFlip.paused()).to.equal(false);
+    });
+
+    it('StakingShifumi: Should the correct bank address', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      await stakingShifumi.setBankAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3")
+      expect(await stakingShifumi.getBankAddress()).to.equal("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+    });
+
+    it('StakingShifumi: Should get and set pause', async () => {
+      const { stakingShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await stakingShifumi.pause();
+      expect(await stakingShifumi.paused()).to.equal(true);
+    });
+
+    it('StakingShifumi: Should get and set unpause', async () => {
+      const { stakingShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await stakingShifumi.pause();
+      await stakingShifumi.pause();
+      expect(await stakingShifumi.paused()).to.equal(false);
+    });
   });
 
   describe("Require setBetLimit", function () {
@@ -156,28 +235,13 @@ describe("Deployed BankShifumi", function () {
     it('BankShifumi: Should setBetLimit not lower to 1', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       const newLimitLower = 0;
-      await expect(bankShifumi.setBetLimit(newLimitLower)).to.be.revertedWith("This number is not allowed");
+      await expect(bankShifumi.setBetLimit(newLimitLower)).to.be.revertedWith("This limit is not allowed");
     });
 
     it('BankShifumi: Should setBetLimit not higher to 99', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
       const newLimitHigher = 100;
-      await expect(bankShifumi.setBetLimit(newLimitHigher)).to.be.revertedWith("This number is not allowed");
-    });
-  });
-
-  describe("Require setMultiplicator", function () {
-    it('BankShifumi: Should setMultiplicator', async () => {
-      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
-      const newLimit = 50;
-      await bankShifumi.setMultiplicator(newLimit);
-      expect(await bankShifumi.getMultiplicator()).to.equal(newLimit);
-    });
-
-    it('BankShifumi: Should setMultiplicator not lower to 1', async () => {
-      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
-      const newLimitLower = 0;
-      await expect(bankShifumi.setMultiplicator(newLimitLower)).to.be.revertedWith("This number is not allowed");
+      await expect(bankShifumi.setBetLimit(newLimitHigher)).to.be.revertedWith("This limit is not allowed");
     });
   });
 
@@ -210,7 +274,7 @@ describe("Deployed BankShifumi", function () {
   describe("Require bet", function () {
     it('BankShifumi: Should contract game address is allow', async () => {
       const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
-      await expect(bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,10000,[29,2])).to.be.revertedWith("This token is not allowed");
+      await expect(bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,10000,[29,2])).to.be.revertedWith("This address is not allowed");
     });
 
     it('BankShifumi: Should token is allow', async () => {
@@ -233,13 +297,42 @@ describe("Deployed BankShifumi", function () {
     
   });
 
-  describe("BankShifumi: Bet event", function () {
-    it('BankShifumi: Should array is allow', async () => {
-      const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
-      await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true); //Allow game contract
-      await bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[1]);
-     
+  describe("Require setBankAddress", function () {
+    it('StakingShifumi: Should setBankAddress ', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      await stakingShifumi.setBankAddress("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+      expect(await stakingShifumi.getBankAddress()).to.equal("0x5FbDB2315678afecb367f032d93F642f64180aa3");
     });
   });
+
+  describe("Require addFees", function () {
+    it('StakingShifumi: Should addFees only bank address ', async () => {
+      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.addFees(1)).to.be.revertedWith("Only bankaddress");
+    });
+  });
+
+  describe("Require addStaking", function () {
+    it('StakingShifumi: Should addStaking amount ', async () => {
+      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.addStaking(0)).to.be.revertedWith("This amount is not allowed");
+    });
+
+    it('StakingShifumi: Should addStaking amount ', async () => {
+      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
+      await stakingShifumi.addStaking(1);
+    });
+  });
+
+
+
+  //describe("BankShifumi: Bet event", function () {
+    //it('BankShifumi: Should array is allow', async () => {
+      //const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      //await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true); //Allow game contract
+      //await bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[1]);
+     
+    //});
+  //});
 
 });

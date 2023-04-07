@@ -59,9 +59,8 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     using Counters for Counters.Counter;
     Counters.Counter private gameId;
 
-    constructor(string memory _gasToken,uint8 _betlimit,uint64 subscriptionId) VRFConsumerBaseV2(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed) {
+    constructor(string memory _gasToken,uint64 subscriptionId) VRFConsumerBaseV2(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed) {
         gasToken=_gasToken;
-        betLimit=_betlimit;
         whitelistToken[address(0)] = true;
         arrayWhiteListToken.push(address(0));
         COORDINATOR = VRFCoordinatorV2Interface(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed);
@@ -70,6 +69,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
 
     // ** EVENTS ** /
     event Bet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
+    event Back(uint _id);
 
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
@@ -145,7 +145,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     /// @notice Launch the game
     /// @dev Pause or unpause the contract with the openzeppeling contract
     /// @param _token token address,_amount bet amount,_numbers array of numbers
-    function bet(address _gameContract,address _token,uint256 _amount,uint8[] memory _numbers) payable external{
+    function bet(address _gameContract,address _token,uint256 _amount,uint8[] memory _numbers) payable external whenNotPaused{
         require(getWhitelistToken(_token)==true, "This token is not allowed");
         require(getWhitelistGame(_gameContract)==true, "This address is not allowed");
         require(_amount>0,"This amount is not allowed");
@@ -212,8 +212,6 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         return (names, balances);
     }
 
-      
-
     function fulfillRandomWords(
         uint256 _requestId,
         uint256[] memory _randomWords
@@ -221,6 +219,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
+        emit Back(_requestId);
     }
 
     // to check the request status of random number call.
