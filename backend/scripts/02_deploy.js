@@ -5,7 +5,7 @@ async function main() {
   const contractName="BankShifumi"
   const gasToken="MATIC";
   const chainlinkID=1;
-  const erc20Address="0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
+  const erc20Address="0xD729715C32811650074975B1c56b1d5fB7405402";
   const betlimitation=10;
 
   const BankShifumi = await hre.ethers.getContractFactory(contractName);

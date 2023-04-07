@@ -47,7 +47,7 @@ export default function Home() {
     try {
         const contract = new ethers.Contract(contractAddressBank, abiBank, signer)
         if(contractAddress,document.getElementById("inputaddress").value==ethers.constants.AddressZero){
-          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1],{ value: ethers.utils.parseUnits("1", "ether") })
+          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1],{ value: ethers.utils.parseUnits("0,1", "ether") })
         }else{
           let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1])
         }

@@ -31,6 +31,8 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     uint16 requestConfirmations = 3;
     uint32 callbackGasLimit = 100000;  //Chainlink
     uint256 public lastRequestId; //Chainlink
+    uint public s_randomRange;
+    string public s_WinLose;
 
     string public gasToken;
     uint64 s_subscriptionId; //Chainlink Your subscription ID.
@@ -38,7 +40,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     address[] arrayWhiteListToken;
     uint256[] public requestIds; //Chainlink
     
-    bytes32 keyHash = 0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c;//Chainlink
+    bytes32 keyHash = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;//Chainlink
     struct TokenInformation {
         string name;
         uint balance; 
@@ -47,7 +49,13 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     struct RequestStatus { //Chainlink
         bool fulfilled; // whether the request has been successfully fulfilled
         bool exists; // whether a requestId exists
+        uint8[] numbers;
+        uint256 multiplier;
+        uint256 amount;
+        uint256 id;
         uint256[] randomWords;
+        address gameAddress;
+        address playerAddress;
     }
 
     mapping(address=> bool) public whitelistToken; 
@@ -176,13 +184,20 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         s_requests[requestId] = RequestStatus({
             randomWords: new uint256[](0),
             exists: true,
-            fulfilled: false
+            fulfilled: false,
+            gameAddress:_gameContract,
+            playerAddress:msg.sender,
+            numbers:_numbers,
+            multiplier:multiplicator,
+            amount:_amount,
+            id: requestIds.length+1
         });
         requestIds.push(requestId);
         lastRequestId = requestId;
 
-        emit Bet(requestId,IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
-        //uint256 requestId = requestRandomWords();
+        
+
+        emit Bet(requestIds.length,IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
     }
 
     /// @notice Return the all whitelist token
@@ -219,6 +234,15 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         require(s_requests[_requestId].exists, "request not found");
         s_requests[_requestId].fulfilled = true;
         s_requests[_requestId].randomWords = _randomWords;
+
+        s_randomRange = (_randomWords[0] % 2) + 1;
+        s_WinLose="DRAW";
+        //for (uint i=0;i <s_requests[_requestId].numbers.length;i++){
+          //  if(s_randomRange==s_requests[_requestId].numbers[i]){
+            //    s_WinLose="WIN";
+            //}
+        //}
+
         emit Back(_requestId);
     }
 
