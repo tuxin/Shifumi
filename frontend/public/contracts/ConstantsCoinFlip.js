@@ -1,4 +1,4 @@
-export const contractAddress = "0x5AAB4EbC5C2C6933E29CD0f19D1320749B3c5e81"
+export const contractAddressCoinFlip = "0xDe0d673d0687eC0dbd90a5427D7DA6f263e00cB2"
 export const abi = [
   {
     "inputs": [
@@ -15,6 +15,16 @@ export const abi = [
       {
         "internalType": "uint8",
         "name": "_randomNumber",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_maxround",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint8",
+        "name": "_winninground",
         "type": "uint8"
       },
       {
@@ -85,6 +95,32 @@ export const abi = [
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getMaxRound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getModulo",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint8[]",
@@ -106,6 +142,19 @@ export const abi = [
   {
     "inputs": [],
     "name": "getRandomNumber",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getWinningRound",
     "outputs": [
       {
         "internalType": "uint256",
@@ -160,6 +209,19 @@ export const abi = [
     "inputs": [
       {
         "internalType": "uint8",
+        "name": "_maxRound",
+        "type": "uint8"
+      }
+    ],
+    "name": "setMaxRound",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
         "name": "_multiplicator",
         "type": "uint8"
       }
@@ -178,6 +240,19 @@ export const abi = [
       }
     ],
     "name": "setRandomNumber",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint8",
+        "name": "_winningRound",
+        "type": "uint8"
+      }
+    ],
+    "name": "setWinningRound",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

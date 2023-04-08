@@ -1,17 +1,23 @@
 const hre = require("hardhat");
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function main() {
 
   //Constants
   const contractName="CoinFlip"
-  const bankContract="0x3f642FfAc96546fB84D9Cb1B43cCe5F222b105C5";
+  const bankContract="0x41Cd635B6F37560173E132376682af19bB21bf0a";
   const multiplicator=18;
   const randomNumber=1;
+  const maxRound=1;
+  const winningRound=1;
   const gameName="CoinFlip";
   const contractBankName="BankShifumi"
 
   const CoinFlip = await hre.ethers.getContractFactory(contractName);
-  const coinFlip = await CoinFlip.deploy(bankContract,multiplicator,randomNumber,gameName);
+  const coinFlip = await CoinFlip.deploy(bankContract,multiplicator,randomNumber,maxRound,winningRound,gameName);
 
   await coinFlip.deployed();
 
@@ -23,6 +29,7 @@ async function main() {
   console.log(`Allow CoinFlip contract in the bank contract`);
   const bankShifumi = await hre.ethers.getContractAt(contractBankName,bankContract);
   await bankShifumi.setWhitelistGame(coinFlip.address,true);
+  await sleep(10000);
   const allowgame = await bankShifumi.getWhitelistGame(coinFlip.address);
   console.log(`Result: ${allowgame}`);
   console.log(`------------`);

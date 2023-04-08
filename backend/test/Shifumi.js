@@ -13,6 +13,11 @@ describe("Deployed BankShifumi", function () {
     const betLimit = 7;
     const supply = "7777777000000000000000000"
     const gameNameCoinFlip="CoinFlip"
+    const coinFlipMultiplicator = 18
+    const coinFlipRandomNumber = 1
+    const coinFlipMaxRound = 1
+    const coinFlipWinningRound = 1
+    const CoinFlipModulo=2;
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await ethers.getSigners();
@@ -25,12 +30,12 @@ describe("Deployed BankShifumi", function () {
     await bankShifumi.setBetLimit(betLimit);
 
     const CoinFlip = await ethers.getContractFactory("CoinFlip");
-    const coinFlip = await CoinFlip.deploy(bankShifumi.address,18,1,"CoinFlip");
+    const coinFlip = await CoinFlip.deploy(bankShifumi.address,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,"CoinFlip");
 
     const StakingShifumi = await ethers.getContractFactory("StakingShifumi");
     const stakingShifumi = await StakingShifumi.deploy(bankShifumi.address,eRC20.address);
 
-    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi };
+    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,CoinFlipModulo };
   }
 
   //Testing the correct deployment
@@ -73,6 +78,26 @@ describe("Deployed BankShifumi", function () {
     it('CoinFlip: Should the correct game name', async () => {
       const { coinFlip,gameNameCoinFlip } = await loadFixture(deployBankShifumi);
       expect(await coinFlip.getGameName()).to.equal(gameNameCoinFlip);
+    });
+
+    it('CoinFlip: Should the correct module', async () => {
+      const { coinFlip,CoinFlipModulo } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getModulo()).to.equal(CoinFlipModulo);
+    });
+
+    it('CoinFlip: Should the correct random number', async () => {
+      const { coinFlip,coinFlipRandomNumber } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getRandomNumber()).to.equal(coinFlipRandomNumber);
+    });
+
+    it('CoinFlip: Should the correct max round', async () => {
+      const { coinFlip,coinFlipMaxRound } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getMaxRound()).to.equal(coinFlipMaxRound);
+    });
+
+    it('CoinFlip: Should the correct winning round', async () => {
+      const { coinFlip,coinFlipWinningRound } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getWinningRound()).to.equal(coinFlipWinningRound);
     });
 
     it('StakingShifumi: Should not in pause', async () => {
@@ -136,6 +161,16 @@ describe("Deployed BankShifumi", function () {
       const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
       await expect(coinFlip.connect(otherAccount).setRandomNumber(2)).to.be.revertedWith("Ownable: caller is not the owner");
     });
+
+    it('CoinFlip: Should not change how many max round by other account', async () => {
+      const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await expect(coinFlip.connect(otherAccount).setMaxRound(2)).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+
+    it('CoinFlip: Should not change how many winning round by other account', async () => {
+      const { coinFlip,owner,otherAccount } = await loadFixture(deployBankShifumi);
+      await expect(coinFlip.connect(otherAccount).setWinningRound(2)).to.be.revertedWith("Ownable: caller is not the owner");
+    });
   });
 
   describe("Change value", function () {
@@ -195,6 +230,18 @@ describe("Deployed BankShifumi", function () {
       const { coinFlip } = await loadFixture(deployBankShifumi);
       await coinFlip.setMultiplicator(2);
       expect(await coinFlip.getMultiplicator([1])).to.equal(2);
+    });
+
+    it('CoinFlip: Should get and set the max round number', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      await coinFlip.setMaxRound(2);
+      expect(await coinFlip.getMaxRound()).to.equal(2);
+    });
+
+    it('CoinFlip: Should get and set the winning round number', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      await coinFlip.setWinningRound(2);
+      expect(await coinFlip.getWinningRound()).to.equal(2);
     });
 
     it('CoinFlip: Should get and set unpause', async () => {
@@ -324,7 +371,24 @@ describe("Deployed BankShifumi", function () {
     });
   });
 
+  describe("Require getMultiplicator", function () {
+    it('CoinFlip: getMultiplicator with 0 numbers', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getMultiplicator([])).to.equal(0);
+    });
 
+    it('CoinFlip: getMultiplicator with 1 number', async () => {
+      const { coinFlip,coinFlipMultiplicator } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getMultiplicator([1])).to.equal(coinFlipMultiplicator);
+    });
+
+    it('CoinFlip: getMultiplicator with >1 number', async () => {
+      const { coinFlip } = await loadFixture(deployBankShifumi);
+      expect(await coinFlip.getMultiplicator([1,2])).to.equal(1);
+    });
+  });
+
+ 
 
   //describe("BankShifumi: Bet event", function () {
     //it('BankShifumi: Should array is allow', async () => {

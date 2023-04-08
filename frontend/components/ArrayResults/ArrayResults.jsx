@@ -15,7 +15,7 @@ const ArrayResults = () => {
   
     const  provider  = useProvider()
     const contractev = new ethers.Contract(contractAddressBank, abiBank, provider);
-    contractev.on("Bet", (_id,_gameName,_account,_amount,_numbers,_multiplier,_nameToken,_timestamp,event)=>{
+    contractev.on("BetThrow", (_id,_gameName,_account,_amount,_numbers,_multiplier,_nameToken,_timestamp,event)=>{
         let transferEvent ={
             eventData: event,
         }
@@ -42,13 +42,13 @@ const ArrayResults = () => {
                 <Td>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(_timestamp*1000)}</Td>
             </Tr>
         );
-        setInprogressbet(tableinprogress)
+        //setInprogressbet(tableinprogress)
     })
 
    
     const getDatasff = async() => {
         const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
-        const events = await contractBank.queryFilter('Bet');
+        const events = await contractBank.queryFilter('BetThrow');
         const listItems = events.map((number) =>
                 <Tr>
                 <Td></Td>
@@ -66,7 +66,7 @@ const ArrayResults = () => {
         );
         setDonebet(listItems)
       }
-      getDatasff()
+      //getDatasff()
 
   return (
     <>

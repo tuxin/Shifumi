@@ -12,16 +12,22 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 contract CoinFlip is Ownable,Pausable  {   
 
-    address bankAddress;
+    uint8 modulo = 2;
     uint8 multiplicator;
     uint8 randomNumber;
+    uint8 maxRound;
+    uint8 winningRound;
     string name;
+    address bankAddress;
+    
 
-    constructor(address _address,uint8 _multiplicator,uint8 _randomNumber,string memory _name) {
+    constructor(address _address,uint8 _multiplicator,uint8 _randomNumber,uint8 _maxround,uint8 _winninground,string memory _name) {
         bankAddress=_address;
         multiplicator=_multiplicator;
         randomNumber=_randomNumber;
         name=_name;
+        maxRound=_maxround;
+        winningRound=_winninground;
     }
 
     // ** SETTER ** //
@@ -41,13 +47,44 @@ contract CoinFlip is Ownable,Pausable  {
         randomNumber = _randomNumber ; 
     }
 
+    /// @notice Set the _maxRound
+    /// @dev Set how maxRound we need in uint8 >0
+    /// @param _maxRound in uint8 >0
+    function setMaxRound(uint8 _maxRound) external onlyOwner{
+        require(_maxRound>0, "This number is not allowed");
+        maxRound = _maxRound ; 
+    }
+
+    /// @notice Set the _winningRound
+    /// @dev Set how many _winningRound we need in uint8 >0
+    /// @param _winningRound in uint8 >0
+    function setWinningRound(uint8 _winningRound) external onlyOwner{
+        require(_winningRound>0, "This number is not allowed");
+        winningRound = _winningRound ; 
+    }
+
     // ** GETTER ** //
     /// @notice get the multiplicator
     /// @dev get an uint. 
     /// @param _numbers numbers but its genereic parameter. 
     /// @return multiplicator the multuplicator
     function getMultiplicator(uint8[] memory _numbers) public view returns (uint){
-        return multiplicator;
+        
+        uint multiplicatorcalculate;
+
+        if (_numbers.length==0){
+            multiplicatorcalculate=0;
+        }
+
+        if (_numbers.length==1){
+            multiplicatorcalculate=multiplicator;
+        }
+
+        if (_numbers.length>1){
+            multiplicatorcalculate=1;
+        }
+
+        return multiplicatorcalculate;
     }
 
     /// @notice get the number of random number
@@ -57,11 +94,32 @@ contract CoinFlip is Ownable,Pausable  {
         return randomNumber;
     }
 
+    /// @notice get the number of maxRound
+    /// @dev get an uint. 
+    /// @return maxRound; have many maxRound
+    function getMaxRound() public view returns (uint){
+        return maxRound;
+    }
+
+    /// @notice get the number of winningRound
+    /// @dev get an uint. 
+    /// @return winningRound; have many winningRound
+    function getWinningRound() public view returns (uint){
+        return winningRound;
+    }
+
     /// @notice get the name of game
     /// @dev get a string. 
     /// @return name name of the game
     function getGameName() public view returns (string memory){
         return name;
+    }
+
+    /// @notice get the modulo
+    /// @dev get an uint8. 
+    /// @return modulo have many random number
+    function getModulo() public view returns (uint8){
+        return modulo;
     }
 
 

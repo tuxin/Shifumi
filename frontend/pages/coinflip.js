@@ -11,8 +11,9 @@ import { ConnectButton, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { ethers } from 'ethers'
-import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
+import { contractAddressCoinFlip, abi } from "../public/contracts/ConstantsCoinFlip.js"
 import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
+import { abiERC20 } from "../public/contracts/ConstantsERC20.js"
 import React, { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -22,10 +23,21 @@ export default function Home() {
   const { address, isConnected } = useAccount()
   const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
-  const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
   const [multiplicator, setMultiplicator] = useState(null)
-  const handleWinningAmountChange  = (event) => {
-    setWinningAmount(event.target.value);
+
+
+  
+  const handleWinningAmountChange = async() => {
+
+    if(document.getElementById("inputaddress").value!=ethers.constants.AddressZero){
+      const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
+      const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+
+      if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+          document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
+      }
+    }
+    
   };
 
   useEffect(()=> {
@@ -35,25 +47,41 @@ export default function Home() {
   },[address])
 
   const getDatas = async() => {
-    const contract = new ethers.Contract(contractAddress,abi,provider)
+    const contractCoinFlip = new ethers.Contract(contractAddressCoinFlip,abi,provider)
 
     //Find the multiplicator
-    let multiplicatorvalue = await contract.getMultiplicator([1])
+    let multiplicatorvalue = await contractCoinFlip.getMultiplicator([1])
     multiplicatorvalue= multiplicatorvalue/10
     setMultiplicator(multiplicatorvalue.toString())
   }
 
   const setTheBet = async() => {
     try {
-        const contract = new ethers.Contract(contractAddressBank, abiBank, signer)
-        if(contractAddress,document.getElementById("inputaddress").value==ethers.constants.AddressZero){
-          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1],{ value: ethers.utils.parseUnits("0,1", "ether") })
+        const contractBank = new ethers.Contract(contractAddressBank, abiBank, signer)
+        const tokenamount = document.getElementById("inputvaluebet").value;
+
+        if(document.getElementById("inputaddress").value==ethers.constants.AddressZero){
+          let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[1],{ value: ethers.utils.parseEther(tokenamount) })
+          await transaction.wait()
+          //router.push('/coinflip')
         }else{
-          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1])
+          const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
+          const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+
+          
+          
+          if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+            const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,signer)
+            let transaction = await contractERC20.approve(contractAddressBank,ethers.utils.parseEther(tokenamount))
+            await transaction.wait()
+            document.getElementById("buttonconnect").innerHTML="Heads to win "+document.getElementById("inputaddressname").value
+          }else{
+            let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[1])
+            console.log(await transaction.wait())
+            router.push('/coinflip')
+          }
+          
         }
-        await transaction.wait()
-        router.push('/coinflip')
-        console.log("Success")
     }
     catch(e) {
         console.log(e)
@@ -344,6 +372,7 @@ export default function Home() {
                     <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
                   )}
                       <Input type="hidden" id="inputaddress" />
+                      <Input type="hidden" id="inputaddressname" />
                     </Center> 
                   </Box>
                 </VStack>

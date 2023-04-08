@@ -15,14 +15,18 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 
 
 
 interface IDataInterfaceGame {
   function getMultiplicator(uint8[] memory _numbers) external pure returns(uint);
-  function getRandomNumber() external pure returns(uint);
+  function getRandomNumber() external pure returns(uint8);
   function getGameName() external pure returns(string memory);
+  function getModulo() external pure returns(uint8);
+  function getMaxRound() external pure returns(uint8);
+  function getWinningRound() external pure returns(uint8);
 }
 
 contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {   
@@ -30,40 +34,53 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     uint8 public betLimit; 
     uint16 requestConfirmations = 3;
     uint32 callbackGasLimit = 100000;  //Chainlink
-    uint256 public lastRequestId; //Chainlink
-    uint public s_randomRange;
-    string public s_WinLose;
-
-    string public gasToken;
     uint64 s_subscriptionId; //Chainlink Your subscription ID.
 
+    string public gasToken;
+    
+    string public betOK;
+    uint8 public betOKNum;
+    uint256 public betResult;
+
     address[] arrayWhiteListToken;
-    uint256[] public requestIds; //Chainlink
     
     bytes32 keyHash = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;//Chainlink
+   
     struct TokenInformation {
         string name;
         uint balance; 
     }
 
-    struct RequestStatus { //Chainlink
-        bool fulfilled; // whether the request has been successfully fulfilled
-        bool exists; // whether a requestId exists
-        uint8[] numbers;
+    struct Bet { //Chainlink
+        uint8 modulo;
+        uint8 randomNumber;
+        uint8 maxRound;
+        uint8 winningRound;
         uint256 multiplier;
         uint256 amount;
         uint256 id;
+        uint8[] numbers;
+        uint256[] result;
         uint256[] randomWords;
         address gameAddress;
+        address tokenAddress;
         address playerAddress;
+        string tokenName;
+    }
+
+    struct Round {
+        uint winningRound;
+        uint totalRound;
     }
 
     mapping(address=> bool) public whitelistToken; 
     mapping(address=> bool) public whitelistGame; 
-    mapping(uint256 => RequestStatus) public s_requests; //Chainlink /* requestId --> requestStatus */
+    mapping(uint256 => Bet) public betList; //Chainlink /* requestId --> requestStatus */
+    mapping(address => mapping(address => Round)) public userGameRound;
 
     VRFCoordinatorV2Interface COORDINATOR; //For Chainlink
 
+    using SafeMath for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private gameId;
 
@@ -76,8 +93,8 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     }
 
     // ** EVENTS ** /
-    event Bet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
-    event Back(uint _id);
+    event BetThrow (uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
+    event ResultBet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp,string _result,uint256 _randomnumber,uint256 _winningamount);
 
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
@@ -161,43 +178,62 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         require(IDataInterfaceGame(_gameContract).getMultiplicator(_numbers)>0,"Multiplicator is not valid");
         require(IDataInterfaceGame(_gameContract).getRandomNumber()>0,"Multiplicator is not valid");
 
+        bool successTransfer;
         string memory nameToken;
-        uint256 multiplicator;
-        uint requestId;
-
-        multiplicator=IDataInterfaceGame(_gameContract).getMultiplicator(_numbers);
-        gameId.increment();
+        uint8 modulo = IDataInterfaceGame(_gameContract).getModulo();
+        uint8 maxRound = IDataInterfaceGame(_gameContract).getMaxRound();
+        uint8 winningRound = IDataInterfaceGame(_gameContract).getWinningRound();
+        uint8 randomNumber = IDataInterfaceGame(_gameContract).getRandomNumber() ;
+        uint256 multiplicator=IDataInterfaceGame(_gameContract).getMultiplicator(_numbers) ;
+        uint256 maxgain=multiplicator.mul(_amount);
+        uint256 requestId;
 
         if(_token==address(0)){
             nameToken = gasToken;
-          }else{
+            successTransfer=true;
+        }else{
             nameToken = IERC20Metadata(_token).name();
-          }
 
-        requestId = COORDINATOR.requestRandomWords(
-            keyHash,
-            s_subscriptionId,
-            requestConfirmations,
-            callbackGasLimit,
-            1
-        );
-        s_requests[requestId] = RequestStatus({
-            randomWords: new uint256[](0),
-            exists: true,
-            fulfilled: false,
-            gameAddress:_gameContract,
-            playerAddress:msg.sender,
-            numbers:_numbers,
-            multiplier:multiplicator,
-            amount:_amount,
-            id: requestIds.length+1
-        });
-        requestIds.push(requestId);
-        lastRequestId = requestId;
+            //Allow smartcontrat to send rewards
+            if (IERC20(_token).allowance(address(this),address(msg.sender))<maxgain){
+                IERC20(_token).approve(address(msg.sender),maxgain);
+            }
 
-        
+            successTransfer=IERC20(_token).transferFrom(msg.sender,address(this),_amount);
+        }
 
-        emit Bet(requestIds.length,IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
+        if(successTransfer){
+            requestId = COORDINATOR.requestRandomWords(
+                keyHash,
+                s_subscriptionId,
+                requestConfirmations,
+                callbackGasLimit,
+                randomNumber
+            );
+
+            if(requestId>0){
+                gameId.increment();
+
+                betList[requestId] = Bet({
+                    modulo:modulo,
+                    randomNumber:randomNumber, 
+                    randomWords: new uint256[](0),
+                    result: new uint256[](randomNumber),
+                    gameAddress:_gameContract,
+                    tokenAddress:_token,
+                    playerAddress:msg.sender,
+                    numbers:_numbers,
+                    multiplier:multiplicator,
+                    amount:_amount,
+                    id: gameId.current(),
+                    maxRound:maxRound ,
+                    winningRound:winningRound,
+                    tokenName:nameToken
+                });       
+
+                emit BetThrow(gameId.current(),IDataInterfaceGame(_gameContract).getGameName(),msg.sender,_amount,_numbers,multiplicator,nameToken,block.timestamp);
+            }
+        }
     }
 
     /// @notice Return the all whitelist token
@@ -231,28 +267,56 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         uint256 _requestId,
         uint256[] memory _randomWords
     ) internal override {
-        require(s_requests[_requestId].exists, "request not found");
-        s_requests[_requestId].fulfilled = true;
-        s_requests[_requestId].randomWords = _randomWords;
+        Bet memory betInProgress = betList[_requestId];
+        bool result;
+        uint256 randomNumber;
+        uint256 playerNumber;
+        for (uint i = 0; i < _randomWords.length; i++) {
+            randomNumber=(_randomWords[i] % betList[_requestId].modulo) + 1;
+            for (uint j = 0; j < betList[_requestId].numbers.length; j++) { 
+                playerNumber = betList[_requestId].numbers[j];
+                if(playerNumber==randomNumber){
+                    result=true;
+                    break;
+                }
+            }
+             if(result==true){
+                 break;
+             }
+        }
 
-        s_randomRange = (_randomWords[0] % 2) + 1;
-        s_WinLose="DRAW";
-        //for (uint i=0;i <s_requests[_requestId].numbers.length;i++){
-          //  if(s_randomRange==s_requests[_requestId].numbers[i]){
-            //    s_WinLose="WIN";
-            //}
-        //}
+        userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound++;
+        if(result==true){
+            userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound++;
 
-        emit Back(_requestId);
-    }
+            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound>=betInProgress.winningRound){
+                //Player win
+                uint winningAmount;
+                winningAmount=(betList[_requestId].amount.mul(betList[_requestId].multiplier)).div(10);
 
-    // to check the request status of random number call.
-    function getRequestStatus(
-        uint256 _requestId
-    ) external view returns (bool fulfilled, uint256[] memory randomWords) {
-        require(s_requests[_requestId].exists, "request not found");
-        RequestStatus memory request = s_requests[_requestId];
-        return (request.fulfilled, request.randomWords);
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
+
+                if(betList[_requestId].tokenAddress==address(0)){
+                    (bool sent, bytes memory data) = betList[_requestId].playerAddress.call{value: winningAmount}("");
+                   
+                }else{
+                    bool sent=IERC20(betList[_requestId].tokenAddress).transfer(address(betList[_requestId].playerAddress),winningAmount);
+                }
+                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WIN",randomNumber,winningAmount);
+            }
+        }else{
+            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound>=betInProgress.maxRound){
+                //Player lose
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
+                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"LOSE",randomNumber,0);
+            }else{
+                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WAIT NEXT ROUND",randomNumber,0);
+            }
+
+            
+        }
     }
 
     // Function to receive Ether. msg.data must be empty

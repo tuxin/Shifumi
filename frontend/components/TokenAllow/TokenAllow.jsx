@@ -5,6 +5,7 @@ import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { ethers } from 'ethers'
 import { contractAddressBank, abiBank } from "../../public/contracts/ConstantsBankShifumi.js"
+import { abiERC20 } from "../../public/contracts/ConstantsERC20.js"
 import React, { useEffect, useState } from 'react';
 
 
@@ -23,9 +24,29 @@ const TokenAllow = () => {
       }
   },[address])
 
-  const setSelectedRow  = (name,addressToken) => {
-    document.getElementById("buttonconnect").innerHTML="Heads to win "+name
+  const setSelectedRow  = async(name,addressToken) => {
+    //allowanceverification
     document.getElementById("inputaddress").value=addressToken
+    document.getElementById("inputaddressname").value=name
+    if(document.getElementById("inputaddress").value!=ethers.constants.AddressZero){
+      if(document.getElementById("inputvaluebet").value>0){
+        const contractERC20 = new ethers.Contract(addressToken,abiERC20,provider)
+        const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+
+        if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+          document.getElementById("buttonconnect").innerHTML="Approve "+name
+        }else{
+          "Heads to win "+name
+        }
+        
+      }else{
+        document.getElementById("buttonconnect").innerHTML="Heads to win "+name
+      }
+    }else{
+      document.getElementById("buttonconnect").innerHTML="Heads to win "+name
+    }
+
+    
   };
  
   
