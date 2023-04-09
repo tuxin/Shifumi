@@ -79,7 +79,6 @@ export default function Home() {
         if(document.getElementById("inputaddress").value==ethers.constants.AddressZero){
           let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ value: ethers.utils.parseEther(tokenamount),gasLimit: 5000000 })
           await transaction.wait()
-          //router.push('/coinflip')
         }else{
           const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
           const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
@@ -94,9 +93,7 @@ export default function Home() {
           }else{
             let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ gasLimit: 5000000 })
             console.log(await transaction.wait())
-            router.push('/coinflip')
           }
-          
         }
     }
     catch(e) {

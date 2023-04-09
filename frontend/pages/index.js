@@ -9,7 +9,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
-import { useRouter } from 'next/router'
+
 
 import React, { useEffect, useState } from 'react';
 import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
@@ -19,12 +19,12 @@ export default function Home() {
   const { address, isConnected } = useAccount()
   const { colorMode, toggleColorMode } = useColorMode()
   const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
-  const router = useRouter()
+  
   const handleWinningAmountChange  = (event) => {
     setWinningAmount(event.target.value);
   };
 
-  router.push('/coinflip')
+  
 
   return (
     <>
