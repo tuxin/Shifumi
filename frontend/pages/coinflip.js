@@ -23,9 +23,10 @@ export default function Home() {
   const { address, isConnected } = useAccount()
   const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
-  const [multiplicator, setMultiplicator] = useState(null)
-
-
+  const [multiplicator, setMultiplicator] = useState("null")
+  const [imgSrc, setImgSrc] = useState("/heads.png");
+  const [valueCoin, setValueCoin] = useState(1);
+  const [textCoin, setTextCoin] = useState("Heads");
   
   const handleWinningAmountChange = async() => {
 
@@ -36,6 +37,8 @@ export default function Home() {
       if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
           document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
       }
+
+      
     }
     
   };
@@ -43,6 +46,8 @@ export default function Home() {
   useEffect(()=> {
       if(isConnected){
         getDatas()
+      }else{
+        setMultiplicator(1.8)
       }
   },[address])
 
@@ -55,13 +60,26 @@ export default function Home() {
     setMultiplicator(multiplicatorvalue.toString())
   }
 
+  const setTheCoin  = async() => {
+    if(valueCoin==1){
+      setValueCoin(2)
+      setImgSrc("/tails.png")
+      setTextCoin("Tails")
+    }else{
+      setValueCoin(1)
+      setImgSrc("/heads.png")
+      setTextCoin("Heads")
+    }
+    
+  }
+
   const setTheBet = async() => {
     try {
         const contractBank = new ethers.Contract(contractAddressBank, abiBank, signer)
         const tokenamount = document.getElementById("inputvaluebet").value;
 
         if(document.getElementById("inputaddress").value==ethers.constants.AddressZero){
-          let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[1],{ value: ethers.utils.parseEther(tokenamount) })
+          let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ value: ethers.utils.parseEther(tokenamount),gasLimit: 5000000 })
           await transaction.wait()
           //router.push('/coinflip')
         }else{
@@ -76,7 +94,7 @@ export default function Home() {
             await transaction.wait()
             document.getElementById("buttonconnect").innerHTML="Heads to win "+document.getElementById("inputaddressname").value
           }else{
-            let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[1])
+            let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ gasLimit: 5000000 })
             console.log(await transaction.wait())
             router.push('/coinflip')
           }
@@ -86,6 +104,8 @@ export default function Home() {
     catch(e) {
         console.log(e)
     }
+
+    
   }
 
   return (
@@ -121,7 +141,7 @@ export default function Home() {
                   </Heading>
                   <br></br>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                     <a href="/">Shifumi</a>
+                     <a href="/">Shifumi (Soon)</a>
                   </Text>
                 </Box>
                 <Box>
@@ -168,7 +188,7 @@ export default function Home() {
           <Button onClick={toggleColorMode}>
         Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
       </Button>
-        </GridItem>
+      </GridItem>
 
       <GridItem colSpan={4} >
 
@@ -186,11 +206,9 @@ export default function Home() {
               
           <Grid templateColumns='repeat(5, 1fr)' gap={4}>
         <GridItem colSpan={2} >
-          {isConnected ? (
-            <Text>Your Shifhumi balance :</Text>
-          ) : (
+          
             <Text></Text>
-          )}
+          
         </GridItem>
          <GridItem colStart={6} colEnd={6} align="right">
           <ConnectButton />
@@ -345,7 +363,12 @@ export default function Home() {
                   </Box>
                   <Box>
                     <Center>
-                      <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
+                      <Image width="128" height="128" src={imgSrc} id="coin" onClick={() => setTheCoin()} alt='Shifumi' />
+                    </Center>
+                  </Box>
+                  <Box>
+                    <Center>
+                      <Text fontSize="20" fontFamily="Archivo Black">{textCoin}</Text>
                     </Center>
                   </Box>
                   <Box>
@@ -366,7 +389,7 @@ export default function Home() {
                   <Box>
                     <Center>
                     {isConnected ? (
-                    <Button width="30%" colorScheme='red' id="buttonconnect" onClick={() => setTheBet()}>Heads to win matic</Button>
+                    <Button width="30%" colorScheme='red' id="buttonconnect" onClick={() => setTheBet()}>Select your coin</Button>
                     
                   ) : (
                     <Button width="30%" colorScheme='red'>Please connect your wallet</Button>

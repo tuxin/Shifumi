@@ -12,10 +12,10 @@ const ArrayResults = () => {
 
     const [inprogressbet, setInprogressbet] = useState(null)
     const [donebet, setDonebet] = useState(null)
-  
+    const { address, isConnected } = useAccount()
     const  provider  = useProvider()
     const contractev = new ethers.Contract(contractAddressBank, abiBank, provider);
-    contractev.on("BetThrow", (_id,_gameName,_account,_amount,_numbers,_multiplier,_nameToken,_timestamp,event)=>{
+    /*contractev.on("TestDD", (_id,_gameName,_account,_amount,_numbers,_multiplier,_nameToken,_timestamp,event)=>{
         let transferEvent ={
             eventData: event,
         }
@@ -44,30 +44,42 @@ const ArrayResults = () => {
         );
         //setInprogressbet(tableinprogress)
     })
+    */
 
-   
-    const getDatasff = async() => {
-        const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
-        const events = await contractBank.queryFilter('BetThrow');
+    function choiceConvert(game,value){
+        if(game=="CoinFlip"){
+            if(value==1){
+                return "Heads"
+            }  
+            return "Tails" 
+        }
+        return value
+    }
+
+    //event ResultBet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp,string _result,uint256 _randomnumber,uint256 _winningamount);
+    const getEvents = async() => {
+        const events = await contractev.queryFilter('ResultBet',34161296);
+        
         const listItems = events.map((number) =>
                 <Tr>
                 <Td></Td>
-                <Td>#{number.args[0].toNumber()}</Td>
+                <Td>{(number.args[0]).toNumber()}</Td>
                 <Td>{number.args[1]}</Td>
-                <Td isNumeric>{number.args[3].toNumber()}</Td>
-                <Td isNumeric>{number.args[5].toNumber()/10}</Td>
-                <Td>Choice</Td>
-                <Td>Result</Td>
-                <Td isNumeric>Payout</Td>
-                <Td>Coins</Td>
-                <Td isNumeric>Protocol fees</Td>
-                <Td>Date</Td>
+                <Td isNumeric>{ethers.utils.formatEther(number.args[3])}</Td>
+                <Td isNumeric>{(number.args[5]).toNumber()/10}</Td>
+                <Td>{choiceConvert(number.args[1],number.args[4][0])}</Td>
+                <Td>{number.args[8]}</Td>
+                <Td isNumeric>{ethers.utils.formatEther(number.args[10])}</Td>
+                <Td><Image width="48" height="48" src={`/tokenwhitelist/${number.args[6]}.png`} alt='Shifumi' /></Td>
+                <Td isNumeric>{ethers.utils.formatEther((number.args[3]/100*3).toString())}</Td>
+                <Td>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(number.args[7]*1000)}</Td>
             </Tr>
-        );
+        ).reverse();
         setDonebet(listItems)
-      }
-      //getDatasff()
-
+    }
+    if(isConnected){
+        getEvents()
+    }
   return (
     <>
     <Card >
@@ -104,6 +116,7 @@ const ArrayResults = () => {
                         <Tfoot>
                         <Tr>
                             <Th></Th>
+                            <Th>Id</Th>
                             <Th>Games</Th>
                             <Th isNumeric>Bet</Th>
                             <Th isNumeric>Multiplier</Th>

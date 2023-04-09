@@ -17,9 +17,6 @@ import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import "@chainlink/contracts/src/v0.8/ConfirmedOwner.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-
-
-
 interface IDataInterfaceGame {
   function getMultiplicator(uint8[] memory _numbers) external pure returns(uint);
   function getRandomNumber() external pure returns(uint8);
@@ -32,16 +29,11 @@ interface IDataInterfaceGame {
 contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {   
     
     uint8 public betLimit; 
-    uint16 requestConfirmations = 3;
-    uint32 callbackGasLimit = 100000;  //Chainlink
+    uint16 requestConfirmations = 2;
+    uint32 callbackGasLimit = 1000000;  //Chainlink
     uint64 s_subscriptionId; //Chainlink Your subscription ID.
 
     string public gasToken;
-    
-    string public betOK;
-    uint8 public betOKNum;
-    uint256 public betResult;
-    string public trs;
 
     address[] arrayWhiteListToken;
     
@@ -96,7 +88,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     // ** EVENTS ** /
     event BetThrow (uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
     event ResultBet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp,string _result,uint256 _randomnumber,uint256 _winningamount);
-    event TestDD(string _win);
+
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
     /// @dev Returns a setting uint.
@@ -202,7 +194,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
 
             successTransfer=IERC20(_token).transferFrom(msg.sender,address(this),_amount);
         }
-
+        
         if(successTransfer){
             requestId = COORDINATOR.requestRandomWords(
                 keyHash,
@@ -270,6 +262,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     ) internal override {
         Bet memory betInProgress = betList[_requestId];
         bool result;
+        bool sendAmount;
         uint256 randomNumber;
         uint256 playerNumber;
         uint256 winningAmount;  
@@ -291,49 +284,38 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
              }
         }
 
-         trs="BEFORE SEND";
-        sendPayout(betInProgress,result,winningAmount);
+        userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound++;
+        if(result==true){
+            userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound++;
 
-        emit TestDD(resultName);
-        //emit ResultBet(betInProgress.id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betInProgress.playerAddress,betInProgress.amount,betInProgress.numbers,betInProgress.multiplier,betInProgress.tokenName,block.timestamp,resultName,randomNumber,winningAmount);
+            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound>=betInProgress.winningRound){
+                //Player win
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
+
+                sendAmount=true;
+                
+            }
+        }else{     
+            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound>=betInProgress.maxRound){
+                //Player lose
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
+                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
+            }
+        }
+
+        if(sendAmount==true){
+            sendPayout(betInProgress.playerAddress,betInProgress.tokenAddress,winningAmount);
+        }
+        
+        emit ResultBet(betInProgress.id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betInProgress.playerAddress,betInProgress.amount,betInProgress.numbers,betInProgress.multiplier,betInProgress.tokenName,block.timestamp,resultName,randomNumber,winningAmount);
     }
 
-    function sendPayout(Bet memory _betInProgress,bool _result,uint256 winningAmount) internal{
-        trs="ON VA PAYER";
-        userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound++;
-        if(_result==true){
-            userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound++;
-
-            if(userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound>=_betInProgress.winningRound){
-                //Player win
-                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound=0;
-                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound=0;
-
-                if(_betInProgress.tokenAddress==address(0)){
-                    (bool sent, bytes memory data) = _betInProgress.playerAddress.call{value: winningAmount}("");
-
-                    if (sent==true){
-                        trs="NATIVE OK";
-                    }else{
-                        trs="NATIVE OK";
-                    }
-                }else{
-                    trs="BEFORE OK";
-                    bool sentERC20=IERC20(_betInProgress.tokenAddress).transfer(address(_betInProgress.playerAddress),winningAmount);
-                    if (sentERC20==true){
-                        trs="ERC20 OK";
-                    }else{
-                        trs="ERC20 OK";
-                    }
-                }
-            }
-        }else{
-            
-            if(userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound>=_betInProgress.maxRound){
-                //Player lose
-                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound=0;
-                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound=0;
-            }
+    function sendPayout(address _player,address _token,uint256 winningAmount) internal{
+        if(_token==address(0)){
+                (bool sent, bytes memory data) = payable(_player).call{value: winningAmount}("");
+            }else{
+                IERC20(_token).transfer(_player,winningAmount);
         }
     }
 

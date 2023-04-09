@@ -35,7 +35,9 @@ describe("Deployed BankShifumi", function () {
     const StakingShifumi = await ethers.getContractFactory("StakingShifumi");
     const stakingShifumi = await StakingShifumi.deploy(bankShifumi.address,eRC20.address);
 
-    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,CoinFlipModulo };
+    const testContract = await ethers.getContractAt("TestContract",bankShifumi.address);
+    
+    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,CoinFlipModulo,testContract };
   }
 
   //Testing the correct deployment
@@ -124,6 +126,12 @@ describe("Deployed BankShifumi", function () {
       const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
       expect(await stakingShifumi.getBankAddress()).to.equal(bankShifumi.address);
     });
+
+    it('StakingShifumi: Should the correct erc20 address', async () => {
+      const { stakingShifumi,eRC20 } = await loadFixture(deployBankShifumi);
+      expect(await stakingShifumi.getTokenAddress()).to.equal(eRC20.address);
+    });
+    
   });
 
   describe("Only Owner", function () {
@@ -342,6 +350,13 @@ describe("Deployed BankShifumi", function () {
       await expect(bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[])).to.be.revertedWith("Empty numbers array");
     });
     
+    it('BankShifumi: bet', async () => {
+      const { bankShifumi,owner,otherAccount,eRC20,coinFlip } = await loadFixture(deployBankShifumi);
+      await bankShifumi.setWhitelistGame(coinFlip.address,true); //Allow game contract
+      await bankShifumi.setWhitelistToken(eRC20.address,true); //Allow token contract
+      await eRC20.connect(owner).approve(bankShifumi.address,100);
+      await bankShifumi.bet(coinFlip.address,eRC20.address,100,[1]);
+    });
   });
 
   describe("Require setBankAddress", function () {
@@ -428,14 +443,27 @@ describe("Deployed BankShifumi", function () {
     });
   });
 
- 
+  describe("BankShifumi Result", function () {
+    it('BankShifumi: send payout true', async () => {
+      const { testContract,eRC20,coinFlip } = await loadFixture(deployBankShifumi);
+      await testContract._sendPayout(coinFlip.address,coinFlip.address,true);
+    });
 
-  //describe("BankShifumi: Bet event", function () {
+    it('BankShifumi: send payout true', async () => {
+      const { testContract,eRC20,coinFlip } = await loadFixture(deployBankShifumi);
+      await testContract._sendPayout(coinFlip.address,coinFlip.address,false);
+    });
+  });
+
+  
+  //describe("StakingShifumi: Staking event", function () {
     //it('BankShifumi: Should array is allow', async () => {
-      //const { bankShifumi,owner,otherAccount } = await loadFixture(deployBankShifumi);
-      //await bankShifumi.setWhitelistGame("0x5FbDB2315678afecb367f032d93F642f64180aa3",true); //Allow game contract
-      //await bankShifumi.bet("0x5fbdb2315678afecb367f032d93f642f64180aa3",ethers.constants.AddressZero,100,[1]);
-     
+      //const { stakingShifumi,bankShifumi,eRC20,owner } = await loadFixture(deployBankShifumi);
+      //await eRC20.connect(owner).approve(stakingShifumi.address,1);
+      //const balancebeowner = await eRC20.balanceOf(owner.address);
+      //console.log(await ethers.provider.getBlock("latest").timestamp)
+      //await expect(stakingShifumi.addStaking(1)).to.emit(stakingShifumi, "Staking").withArgs("Stake", owner.address, 1,1);
+
     //});
   //});
 

@@ -53,6 +53,7 @@ const TokenAllow = () => {
   
   const getDatas = async() => {
     const contractBank = new ethers.Contract(contractAddressBank,abiBank,provider)
+    console.log(contractBank)
     const arrayAllowToken = await contractBank.getBalanceAllowTokens(address)
     const arrayToken = await contractBank.getAllowToken()
     const tableallowtoken= arrayAllowToken.map((allowTokens,index) =>   

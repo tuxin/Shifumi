@@ -20,7 +20,18 @@ const ArrayStaking = () => {
     const  provider  = useProvider()
    
     const contractev = new ethers.Contract(contractAddressStakingShifumi, abiStakingShifumi, provider);
-    
+    //contractev.on("Staking", (_type,_address,_amount,_timestamp,event)=>{
+      //  const tableinprogress= (() =>
+
+        //    <Tr>
+        //        <Td>{_type}</Td>
+        //        <Td>{_address}</Td>
+         //       <Td>{ethers.utils.formatEther(_amount)}</Td>
+         //       <Td>{new Intl.DateTimeFormat('en-US', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(_timestamp*1000)}</Td>
+         //   </Tr>
+       // );
+       // setInprogressbet(tableinprogress)
+    //})
 
    
     const getEvents = async() => {

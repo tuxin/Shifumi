@@ -1,4 +1,4 @@
-export const contractAddressBank = "0x6C5d8d9d4E9d828E481F455320D14868F469d396"
+export const contractAddressBank = "0xB2a30E74232b77d37d88114b670d96B665126254"
 export const abiBank = [
   {
     "inputs": [
@@ -197,19 +197,6 @@ export const abiBank = [
     "inputs": [
       {
         "indexed": false,
-        "internalType": "string",
-        "name": "_win",
-        "type": "string"
-      }
-    ],
-    "name": "TestDD",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -327,45 +314,6 @@ export const abiBank = [
         "internalType": "string",
         "name": "tokenName",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "betOK",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "betOKNum",
-    "outputs": [
-      {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "betResult",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -590,19 +538,6 @@ export const abiBank = [
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "trs",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
