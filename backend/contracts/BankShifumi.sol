@@ -95,7 +95,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     // ** EVENTS ** /
     event BetThrow (uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
     event ResultBet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp,string _result,uint256 _randomnumber,uint256 _winningamount);
-
+    event Test(string _name)
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
     /// @dev Returns a setting uint.
@@ -303,16 +303,19 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
                 }else{
                     bool sent=IERC20(betList[_requestId].tokenAddress).transfer(address(betList[_requestId].playerAddress),winningAmount);
                 }
-                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WIN",randomNumber,winningAmount);
+                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WIN",randomNumber,winningAmount);
+                emit Test("Win")
             }
         }else{
             if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound>=betInProgress.maxRound){
                 //Player lose
                 userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
                 userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
-                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"LOSE",randomNumber,0);
+                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"LOSE",randomNumber,0);
+                emit Test("Lose")
             }else{
-                emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WAIT NEXT ROUND",randomNumber,0);
+                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WAIT NEXT ROUND",randomNumber,0);
+                emit Test("Wait")
             }
 
             
