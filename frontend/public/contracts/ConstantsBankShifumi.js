@@ -1,4 +1,4 @@
-export const contractAddressBank = "0xB2a30E74232b77d37d88114b670d96B665126254"
+export const contractAddressBank = "0xFb6B7d082061bdb58d9E28e807d139a3777fF5c6"
 export const abiBank = [
   {
     "inputs": [

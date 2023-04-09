@@ -29,8 +29,8 @@ interface IDataInterfaceGame {
 contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {   
     
     uint8 public betLimit; 
-    uint16 requestConfirmations = 2;
-    uint32 callbackGasLimit = 1000000;  //Chainlink
+    uint16 requestConfirmations = 3;
+    uint32 callbackGasLimit = 500000;  //Chainlink
     uint64 s_subscriptionId; //Chainlink Your subscription ID.
 
     string public gasToken;

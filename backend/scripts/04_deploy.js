@@ -8,7 +8,7 @@ async function main() {
 
   //Constants
   const contractName="CoinFlip"
-  const bankContract="0xB2a30E74232b77d37d88114b670d96B665126254";
+  const bankContract="0xFb6B7d082061bdb58d9E28e807d139a3777fF5c6";
   const multiplicator=18;
   const randomNumber=1;
   const maxRound=1;

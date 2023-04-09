@@ -1,4 +1,4 @@
-export const contractAddressCoinFlip = "0x26aF5e98AE16628eC6e2e1ff4fd2D25181A664B7"
+export const contractAddressCoinFlip = "0x31E1B918745E51D38126d91DB904b2052A46DC01"
 export const abi = [
   {
     "inputs": [
