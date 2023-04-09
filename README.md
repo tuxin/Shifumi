@@ -8,6 +8,8 @@ Le projet Shifumi est effectué dans le cadre de la formation Alyra pour la prom
 
 [DApp](https://shifumi-h9kh.vercel.app/coinflip)
 
+[Coin Flip Loom](https://www.loom.com/share/cfcf64282cc74a49a91f8da2abdf5529)
+
 [Staking Loom](https://www.loom.com/share/ebaaf2e04597498bbfd8753110e2b4d6)
 
 
