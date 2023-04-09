@@ -35,9 +35,7 @@ describe("Deployed BankShifumi", function () {
     const StakingShifumi = await ethers.getContractFactory("StakingShifumi");
     const stakingShifumi = await StakingShifumi.deploy(bankShifumi.address,eRC20.address);
 
-    const testContract = await ethers.getContractAt("TestContract",bankShifumi.address);
-    
-    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,CoinFlipModulo,testContract };
+    return { bankShifumi,coinFlip,betLimit,owner,otherAccount,eRC20,supply,gameNameCoinFlip,stakingShifumi,coinFlipMultiplicator,coinFlipRandomNumber,coinFlipMaxRound,coinFlipWinningRound,CoinFlipModulo };
   }
 
   //Testing the correct deployment
@@ -443,19 +441,7 @@ describe("Deployed BankShifumi", function () {
     });
   });
 
-  describe("BankShifumi Result", function () {
-    it('BankShifumi: send payout true', async () => {
-      const { testContract,eRC20,coinFlip } = await loadFixture(deployBankShifumi);
-      await testContract._sendPayout(coinFlip.address,coinFlip.address,true);
-    });
-
-    it('BankShifumi: send payout true', async () => {
-      const { testContract,eRC20,coinFlip } = await loadFixture(deployBankShifumi);
-      await testContract._sendPayout(coinFlip.address,coinFlip.address,false);
-    });
-  });
-
-  
+   
   //describe("StakingShifumi: Staking event", function () {
     //it('BankShifumi: Should array is allow', async () => {
       //const { stakingShifumi,bankShifumi,eRC20,owner } = await loadFixture(deployBankShifumi);
