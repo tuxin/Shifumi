@@ -1,34 +1,111 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
+import TokenAllow from '@/components/TokenAllow/TokenAllow'
+import ArrayResults from '@/components/ArrayResults/ArrayResults'
 import { useAccount, useProvider, useSigner } from 'wagmi'
 import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
 import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
 import { Input } from '@chakra-ui/react'
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
-import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
-import { useRouter } from 'next/router'
-
+import { ethers } from 'ethers'
+import { contractAddressCoinFlip, abi } from "../public/contracts/ConstantsCoinFlip.js"
+import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
+import { abiERC20 } from "../public/contracts/ConstantsERC20.js"
 import React, { useEffect, useState } from 'react';
-import { loadDefaultErrorComponents } from 'next/dist/server/load-components'
 
 export default function Home() {
+  
 
+  const { data: signer } = useSigner()
   const { address, isConnected } = useAccount()
+  const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
-  const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
-  const router = useRouter()
-  const handleWinningAmountChange  = (event) => {
-    setWinningAmount(event.target.value);
+  const [multiplicator, setMultiplicator] = useState("null")
+  const [imgSrc, setImgSrc] = useState("/heads.png");
+  const [valueCoin, setValueCoin] = useState(1);
+  const [textCoin, setTextCoin] = useState("Heads");
+  
+  const handleWinningAmountChange = async() => {
+
+    if(document.getElementById("inputaddress").value!=ethers.constants.AddressZero){
+      const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
+      const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+
+      if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+          document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
+      }
+    }
+    
   };
 
-  router.push('/coinflip')
+  useEffect(()=> {
+      if(isConnected){
+        getDatas()
+      }else{
+        setMultiplicator(1.8)
+      }
+  },[address])
+
+  const getDatas = async() => {
+    const contractCoinFlip = new ethers.Contract(contractAddressCoinFlip,abi,provider)
+
+    //Find the multiplicator
+    let multiplicatorvalue = await contractCoinFlip.getMultiplicator([1])
+    multiplicatorvalue= multiplicatorvalue/10
+    setMultiplicator(multiplicatorvalue.toString())
+  }
+
+  const setTheCoin  = async() => {
+    if(valueCoin==1){
+      setValueCoin(2)
+      setImgSrc("/tails.png")
+      setTextCoin("Tails")
+    }else{
+      setValueCoin(1)
+      setImgSrc("/heads.png")
+      setTextCoin("Heads")
+    }
+    
+  }
+
+  const setTheBet = async() => {
+    try {
+        const contractBank = new ethers.Contract(contractAddressBank, abiBank, signer)
+        const tokenamount = document.getElementById("inputvaluebet").value;
+
+        if(document.getElementById("inputaddress").value==ethers.constants.AddressZero){
+          let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ value: ethers.utils.parseEther(tokenamount),gasLimit: 5000000 })
+          await transaction.wait()
+        }else{
+          const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
+          const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+
+          
+          
+          if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+            const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,signer)
+            let transaction = await contractERC20.approve(contractAddressBank,ethers.utils.parseEther(tokenamount))
+            await transaction.wait()
+            document.getElementById("buttonconnect").innerHTML="Heads to win "+document.getElementById("inputaddressname").value
+          }else{
+            let transaction = await contractBank.bet(contractAddressCoinFlip,document.getElementById("inputaddress").value,ethers.utils.parseEther(tokenamount),[valueCoin],{ gasLimit: 5000000 })
+            console.log(await transaction.wait())
+          }
+        }
+    }
+    catch(e) {
+        console.log(e)
+    }
+
+    
+  }
 
   return (
     <>
-<Head>
+      <Head>
         <title>Shifumi DApp</title>
         <meta name="description" content="Generated by create next app" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -59,12 +136,12 @@ export default function Home() {
                   </Heading>
                   <br></br>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                     <a href="/">Shifumi (Soon)</a>
+                     <a href="/shifumi">Shifumi (Soon)</a>
                   </Text>
                 </Box>
                 <Box>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                    Coin Flip
+                  <a href="/coinflip">Coin Flip</a>
                   </Text>
                 </Box>
                 <Box>
@@ -108,7 +185,6 @@ export default function Home() {
       </Button>
       </GridItem>
 
-
       <GridItem colSpan={4} >
 
       <Grid 
@@ -125,11 +201,9 @@ export default function Home() {
               
           <Grid templateColumns='repeat(5, 1fr)' gap={4}>
         <GridItem colSpan={2} >
-          {isConnected ? (
-            <Text>Your Shifhumi balance :</Text>
-          ) : (
+          
             <Text></Text>
-          )}
+          
         </GridItem>
          <GridItem colStart={6} colEnd={6} align="right">
           <ConnectButton />
@@ -267,7 +341,7 @@ export default function Home() {
               <Stack divider={<StackDivider />} spacing='4'>
                 <Box>
                 <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    Shifumi
+                    Coin Flip
                   </Heading>
                   <br></br>
                 </Box>
@@ -276,66 +350,25 @@ export default function Home() {
                   spacing={2}
                   align='stretch'
                 >
+                  
                   <Box>
                     <Center>
-                      <Text fontSize="20" fontFamily="Archivo Black">Current game</Text>
+                      <Text fontSize="50" fontFamily="Archivo Black">X {multiplicator}</Text>
                     </Center>
                   </Box>
                   <Box>
                     <Center>
-                    <TableContainer>
-  <Table variant='simple'>
-    <Thead>
-      <Tr>
-        <Th>Game</Th>
-        <Th>You</Th>
-        <Th>Opponent</Th>
-        <Th>Result</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      <Tr height="5px">
-        <Td>#1</Td>
-        <Td>Rock</Td>
-        <Td>Leaf</Td>
-        <Td><CloseIcon color="red" /></Td>
-      </Tr>
-      <Tr height="5px">
-        <Td>#2</Td>
-        <Td>Scissors</Td>
-        <Td>Leaf</Td>
-        <Td><CheckIcon color="green" /></Td>
-      </Tr>
-      <Tr height="5px">
-        <Td>#3</Td>
-        <Td>Rock</Td>
-        <Td>Scissors</Td>
-        <Td><CheckIcon color="green" /></Td>
-      </Tr>
-    </Tbody>
-  </Table>
-</TableContainer>
-  
+                      <Image width="128" height="128" src={imgSrc} id="coin" onClick={() => setTheCoin()} alt='Shifumi' />
                     </Center>
                   </Box>
                   <Box>
                     <Center>
-                      <Text fontSize="50" fontFamily="Archivo Black">X 1,97</Text>
-                    </Center>
-                  </Box>
-                  <Box>
-                    <Center>
-                      <SimpleGrid f columns={3} spacing={1}>
-                      <Box><Image width="180" height="180" src='/rock.png' alt='Shifumi' /></Box>
-                      <Box><Image width="180" height="180" src='/leaf.png' alt='Shifumi' /></Box>
-                      <Box><Image width="180" height="180" src='/scissors.png' alt='Shifumi' /></Box>
-                      </SimpleGrid>
-  
+                      <Text fontSize="20" fontFamily="Archivo Black">{textCoin}</Text>
                     </Center>
                   </Box>
                   <Box>
                     <Center>                  
-                      <Input width="30%" placeholder='Amount' type='number' align="center" onChange={handleWinningAmountChange}/>
+                      <Input width="30%" placeholder='Amount' type='number' align="center" id="inputvaluebet" onChange={handleWinningAmountChange}/>
                     </Center> 
                   </Box>
                   <Box>
@@ -351,11 +384,13 @@ export default function Home() {
                   <Box>
                     <Center>
                     {isConnected ? (
-                    <Button width="30%" colorScheme='red'>Heads to win matic</Button>
+                    <Button width="30%" colorScheme='red' id="buttonconnect" onClick={() => setTheBet()}>Select your coin</Button>
+                    
                   ) : (
                     <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
                   )}
-                      
+                      <Input type="hidden" id="inputaddress" />
+                      <Input type="hidden" id="inputaddressname" />
                     </Center> 
                   </Box>
                 </VStack>
@@ -375,35 +410,7 @@ export default function Home() {
                   <br></br>
                 </Box>
 
-                <TableContainer>
-  <Table variant='simple'>
-    <TableCaption>Select your coin</TableCaption>
-    <Thead>
-      <Tr>
-        <Th></Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Your balance</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      <Tr height="5px">
-        <Td><Image width="48" height="48" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td>MATIC</Td>
-        <Td isNumeric>25.4</Td>
-      </Tr>
-      <Tr>
-        <Td><Image width="48" height="48" src='/ethereum_balance.png' alt='Shifumi' /></Td>
-        <Td>ETH</Td>
-        <Td isNumeric>30.48</Td>
-      </Tr>
-      <Tr>
-        <Td><Image width="48" height="48" src='/usdc_balance.png' alt='Shifumi' /></Td>
-        <Td>USDC</Td>
-        <Td isNumeric>307.12</Td>
-      </Tr>
-    </Tbody>
-  </Table>
-</TableContainer>
+               <TokenAllow />
                 
               </Stack>
             </CardBody>
@@ -413,91 +420,8 @@ export default function Home() {
       </Grid>
           
           <br></br>
-          <Card >
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                <Box>
-                <Heading size='md' textTransform='uppercase' fontFamily="alice"> 
-                    Results
-                  </Heading>
-                  <br></br>
-                </Box>
-                <Center color='black'>
-                <TableContainer width="100%">
-  <Table variant='simple' >
-    <Thead>
-      <Tr>
-        <Th></Th>
-        <Th>Games</Th>
-        <Th isNumeric>Bet</Th>
-        <Th isNumeric>Multiplier</Th>
-        <Th>Choice</Th>
-        <Th>Result</Th>
-        <Th isNumeric>Payout</Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Protocol fees</Th>
-        <Th>Date</Th>
-      </Tr>
-    </Thead>
-    <Tbody>
-      <Tr>
-        <Td><CheckIcon color="green" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>3.94</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-      <Tr>
-        <Td><CloseIcon color="red" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>0</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-      <Tr>
-        <Td><CheckIcon color="green" /></Td>
-        <Td>Flip</Td>
-        <Td isNumeric>2</Td>
-        <Td isNumeric>1.97</Td>
-        <Td>Heads</Td>
-        <Td>Heads</Td>
-        <Td isNumeric>3.94</Td>
-        <Td><Image width="36" height="36" src='/matic_balance.png' alt='Shifumi' /></Td>
-        <Td isNumeric>0.06</Td>
-        <Td>2023-03-29 11:47:00</Td>
-      </Tr>
-    </Tbody>
-    <Tfoot>
-      <Tr>
-        <Th></Th>
-        <Th>Games</Th>
-        <Th isNumeric>Bet</Th>
-        <Th isNumeric>Multiplier</Th>
-        <Th>Choice</Th>
-        <Th>Result</Th>
-        <Th isNumeric>Payout</Th>
-        <Th>Coins</Th>
-        <Th isNumeric>Protocol fees</Th>
-        <Th>Date</Th>
-      </Tr>
-    </Tfoot>
-  </Table>
-</TableContainer>
-                </Center>
-              </Stack>
-            </CardBody>
-          </Card>
-
+          <ArrayResults />
+          
         </GridItem>
       </Grid>
       </Layout>
