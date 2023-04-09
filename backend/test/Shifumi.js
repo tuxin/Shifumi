@@ -352,12 +352,6 @@ describe("Deployed BankShifumi", function () {
     });
   });
 
-  describe("Require addFees", function () {
-    it('StakingShifumi: Should addFees only bank address ', async () => {
-      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
-      await expect(stakingShifumi.addFees(1)).to.be.revertedWith("Only bankaddress");
-    });
-  });
 
   describe("Require addStaking", function () {
     it('StakingShifumi: Should addStaking amount ', async () => {
@@ -366,10 +360,56 @@ describe("Deployed BankShifumi", function () {
     });
 
     it('StakingShifumi: Should addStaking amount ', async () => {
-      const { stakingShifumi,bankShifumi } = await loadFixture(deployBankShifumi);
-      await stakingShifumi.addStaking(1);
+      const { stakingShifumi,bankShifumi,eRC20,owner } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.connect(owner).addStaking(1)).to.be.revertedWith("Allowance error");
+    });
+
+    it('StakingShifumi: Should addStaking amount ', async () => {
+      const { stakingShifumi,bankShifumi,eRC20,owner } = await loadFixture(deployBankShifumi);
+      await eRC20.connect(owner).approve(stakingShifumi.address,1);
+      await stakingShifumi.connect(owner).addStaking(1);
+      expect(await stakingShifumi.getUserBalance(owner.address)).to.equal(1);
+
     });
   });
+
+  describe("Require WithdrawStaking", function () {
+    it('StakingShifumi: Should WithdrawStaking amount ', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.withdrawStaking(1)).to.be.revertedWith("Not this staking balance");
+    });
+
+    it('StakingShifumi: Should WithdrawStaking amount ', async () => {
+      const { stakingShifumi } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.withdrawStaking(0)).to.be.revertedWith("This amount is not allowed");
+    });
+
+    it('StakingShifumi: Should WithdrawStaking amount ', async () => {
+      const { stakingShifumi,bankShifumi,eRC20,owner } = await loadFixture(deployBankShifumi);
+      await eRC20.connect(owner).approve(stakingShifumi.address,1);
+      const balancebeowner = await eRC20.balanceOf(owner.address);
+      await stakingShifumi.connect(owner).addStaking(1);
+      await eRC20.approve(owner.address,1);
+      await stakingShifumi.withdrawStaking(1);
+    });
+  });
+
+  describe("Require addFees", function () {
+    it('StakingShifumi: Should addFees only bank address ', async () => {
+      const { stakingShifumi,otherAccount } = await loadFixture(deployBankShifumi);
+      await expect(stakingShifumi.connect(otherAccount).addFees(1)).to.be.revertedWith("Only bankaddress");
+    });
+
+    it('StakingShifumi: Should addFees amount', async () => {
+      const { stakingShifumi,otherAccount,eRC20,owner } = await loadFixture(deployBankShifumi);
+      await eRC20.connect(owner).approve(stakingShifumi.address,1);
+      await stakingShifumi.connect(owner).addStaking(1);
+      await stakingShifumi.connect(owner).addFees(1);
+      console.log(await stakingShifumi.getUserBalance(owner.address));
+    });
+  });
+
+  
 
   describe("Require getMultiplicator", function () {
     it('CoinFlip: getMultiplicator with 0 numbers', async () => {

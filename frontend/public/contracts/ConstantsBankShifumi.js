@@ -1,4 +1,4 @@
-export const contractAddressBank = "0x41Cd635B6F37560173E132376682af19bB21bf0a"
+export const contractAddressBank = "0x6C5d8d9d4E9d828E481F455320D14868F469d396"
 export const abiBank = [
   {
     "inputs": [
@@ -190,6 +190,19 @@ export const abiBank = [
       }
     ],
     "name": "ResultBet",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "_win",
+        "type": "string"
+      }
+    ],
+    "name": "TestDD",
     "type": "event"
   },
   {
@@ -577,6 +590,19 @@ export const abiBank = [
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "trs",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

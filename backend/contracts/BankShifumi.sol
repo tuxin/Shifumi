@@ -41,6 +41,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     string public betOK;
     uint8 public betOKNum;
     uint256 public betResult;
+    string public trs;
 
     address[] arrayWhiteListToken;
     
@@ -95,7 +96,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
     // ** EVENTS ** /
     event BetThrow (uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp);
     event ResultBet(uint _id,string _gameName,address _account,uint256 _amount,uint8[] _numbers,uint _multiplier,string _nameToken,uint _timestamp,string _result,uint256 _randomnumber,uint256 _winningamount);
-    event Test(string _name)
+    event TestDD(string _win);
     // ** GETTER ** //
     /// @notice Return the limit bet percentage. If its 10, you only can bet bank/10
     /// @dev Returns a setting uint.
@@ -271,12 +272,17 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         bool result;
         uint256 randomNumber;
         uint256 playerNumber;
+        uint256 winningAmount;  
+        string memory resultName="LOSE";
+
         for (uint i = 0; i < _randomWords.length; i++) {
-            randomNumber=(_randomWords[i] % betList[_requestId].modulo) + 1;
-            for (uint j = 0; j < betList[_requestId].numbers.length; j++) { 
-                playerNumber = betList[_requestId].numbers[j];
+            randomNumber=(_randomWords[i] % betInProgress.modulo) + 1;
+            for (uint j = 0; j < betInProgress.numbers.length; j++) { 
+                playerNumber = betInProgress.numbers[j];
                 if(playerNumber==randomNumber){
                     result=true;
+                    resultName="WIN";
+                    winningAmount=(betInProgress.amount.mul(betInProgress.multiplier)).div(10);
                     break;
                 }
             }
@@ -285,40 +291,49 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
              }
         }
 
-        userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound++;
-        if(result==true){
-            userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound++;
+         trs="BEFORE SEND";
+        sendPayout(betInProgress,result,winningAmount);
 
-            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound>=betInProgress.winningRound){
+        emit TestDD(resultName);
+        //emit ResultBet(betInProgress.id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betInProgress.playerAddress,betInProgress.amount,betInProgress.numbers,betInProgress.multiplier,betInProgress.tokenName,block.timestamp,resultName,randomNumber,winningAmount);
+    }
+
+    function sendPayout(Bet memory _betInProgress,bool _result,uint256 winningAmount) internal{
+        trs="ON VA PAYER";
+        userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound++;
+        if(_result==true){
+            userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound++;
+
+            if(userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound>=_betInProgress.winningRound){
                 //Player win
-                uint winningAmount;
-                winningAmount=(betList[_requestId].amount.mul(betList[_requestId].multiplier)).div(10);
+                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound=0;
+                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound=0;
 
-                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
-                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
+                if(_betInProgress.tokenAddress==address(0)){
+                    (bool sent, bytes memory data) = _betInProgress.playerAddress.call{value: winningAmount}("");
 
-                if(betList[_requestId].tokenAddress==address(0)){
-                    (bool sent, bytes memory data) = betList[_requestId].playerAddress.call{value: winningAmount}("");
-                   
+                    if (sent==true){
+                        trs="NATIVE OK";
+                    }else{
+                        trs="NATIVE OK";
+                    }
                 }else{
-                    bool sent=IERC20(betList[_requestId].tokenAddress).transfer(address(betList[_requestId].playerAddress),winningAmount);
+                    trs="BEFORE OK";
+                    bool sentERC20=IERC20(_betInProgress.tokenAddress).transfer(address(_betInProgress.playerAddress),winningAmount);
+                    if (sentERC20==true){
+                        trs="ERC20 OK";
+                    }else{
+                        trs="ERC20 OK";
+                    }
                 }
-                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WIN",randomNumber,winningAmount);
-                emit Test("Win")
             }
         }else{
-            if(userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound>=betInProgress.maxRound){
-                //Player lose
-                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].winningRound=0;
-                userGameRound[betInProgress.gameAddress][betInProgress.playerAddress].totalRound=0;
-                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"LOSE",randomNumber,0);
-                emit Test("Lose")
-            }else{
-                //emit ResultBet(betList[_requestId].id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betList[_requestId].playerAddress,betList[_requestId].amount,betList[_requestId].numbers,betList[_requestId].multiplier,betList[_requestId].tokenName,block.timestamp,"WAIT NEXT ROUND",randomNumber,0);
-                emit Test("Wait")
-            }
-
             
+            if(userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound>=_betInProgress.maxRound){
+                //Player lose
+                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].winningRound=0;
+                userGameRound[_betInProgress.gameAddress][_betInProgress.playerAddress].totalRound=0;
+            }
         }
     }
 

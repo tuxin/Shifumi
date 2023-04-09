@@ -12,9 +12,10 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
-contract StakingShifumi is Ownable,Pausable  {   
+contract StakingShifumi is Ownable,Pausable,ReentrancyGuard   {   
 
     uint256 private balances;
     uint256 private feesclaimable;
@@ -33,10 +34,12 @@ contract StakingShifumi is Ownable,Pausable  {
         tokenAddress = _tokenAddress;
     }
 
-    modifier onlyBankAddress {
-      require(msg.sender == bankAddress,"Only bankaddress");
+    modifier onlyBankAddress { 
+      require(msg.sender == bankAddress || msg.sender==owner(),"Only bankaddress");
       _;
    }
+
+   event Staking(string _type,address _address,uint256 _amount,uint256 _timestamp);
 
     // ** GETTER ** //
     /// @notice Return the bankAddresss
@@ -46,11 +49,25 @@ contract StakingShifumi is Ownable,Pausable  {
         return bankAddress; 
     }
 
+    /// @notice Return the tokenAddress
+    /// @dev Returns tokenAddress address.
+    /// @return tokenAddress in address
+    function getTokenAddress() public view returns(address){
+        return tokenAddress; 
+    }
+
     /// @notice Return the total of balances
     /// @dev Returns a balance uint.
     /// @return balances in uint8
     function getBalances() public view returns(uint){
         return balances; 
+    }
+
+    /// @notice Return the user balance
+    /// @dev Returns a balance uint.
+    /// @return _address in uint8
+    function getUserBalance(address _address) public view returns(uint){
+        return stakersBalances[_address]; 
     }
 
     /// @notice Return the total of feesclaimable
@@ -100,6 +117,7 @@ contract StakingShifumi is Ownable,Pausable  {
         require(IERC20(tokenAddress).balanceOf(address(msg.sender))>=_amount, "Balance error");
         require(IERC20(tokenAddress).allowance(address(msg.sender),address(this))>=_amount, "Allowance error");
 
+
         bool successTransfer=IERC20(tokenAddress).transferFrom(msg.sender,address(this),_amount);
 
         if (successTransfer) {
@@ -108,6 +126,32 @@ contract StakingShifumi is Ownable,Pausable  {
                 stakersAddress.push(msg.sender);
             }
             stakersBalances[msg.sender] =  (stakersBalances[msg.sender]).add(_amount);
+
+            //Event
+            emit Staking("Stake",msg.sender,_amount,block.timestamp);
+        }
+    }
+
+    /// @notice withdraw a staking amount from the contract
+    /// @dev withdraw staking amount to the contract with token address and amount
+    /// @param _amount uint256
+    function withdrawStaking(uint256 _amount) external nonReentrant {
+        require(stakersBalances[msg.sender]>=_amount,"Not this staking balance");
+        require(_amount>0,"This amount is not allowed");
+
+        if (IERC20(tokenAddress).allowance(address(this),address(msg.sender))<_amount){
+            IERC20(tokenAddress).approve(address(msg.sender),_amount);
+        }
+
+        bool successTransfer=IERC20(tokenAddress).transfer(msg.sender,_amount);
+        if (successTransfer) {    
+            stakersBalances[msg.sender] =  (stakersBalances[msg.sender]).sub(_amount);
+            if(stakersBalances[msg.sender]==0){
+                isStakers[msg.sender]=false;
+            }
+
+            //Event
+            emit Staking("UnStake",msg.sender,_amount,block.timestamp);
         }
     }
 

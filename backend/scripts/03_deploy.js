@@ -3,7 +3,7 @@ const hre = require("hardhat");
 async function main() {
 
   const contractName="StakingShifumi"
-  const bankAddress="0x9fd07Aae8D48e77408764518adfc7fC15Db27EB3";
+  const bankAddress="0x6C5d8d9d4E9d828E481F455320D14868F469d396";
   const erc20Address="0xD729715C32811650074975B1c56b1d5fB7405402";
 
   console.log(`------------`);

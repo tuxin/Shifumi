@@ -1,36 +1,16 @@
-export const contractAddressCoinFlip = "0x9145bC0c98EBCD682e773507AA968709Cd8c557F"
-export const abi = [
+export const contractAddressStakingShifumi = "0x054ac8583973D1688A7749e24CfCd7cA634c70b9"
+export const abiStakingShifumi = [
   {
     "inputs": [
       {
         "internalType": "address",
-        "name": "_address",
+        "name": "_bankaddress",
         "type": "address"
       },
       {
-        "internalType": "uint8",
-        "name": "_multiplicator",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_randomNumber",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_maxround",
-        "type": "uint8"
-      },
-      {
-        "internalType": "uint8",
-        "name": "_winninground",
-        "type": "uint8"
-      },
-      {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -73,6 +53,37 @@ export const abi = [
     "inputs": [
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "_type",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "_timestamp",
+        "type": "uint256"
+      }
+    ],
+    "name": "Staking",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "account",
         "type": "address"
@@ -82,21 +93,34 @@ export const abi = [
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "getGameName",
-    "outputs": [
+    "inputs": [
       {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
       }
     ],
-    "stateMutability": "view",
+    "name": "addFees",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "addStaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "getMaxRound",
+    "name": "getBalances",
     "outputs": [
       {
         "internalType": "uint256",
@@ -109,12 +133,38 @@ export const abi = [
   },
   {
     "inputs": [],
-    "name": "getModulo",
+    "name": "getBankAddress",
     "outputs": [
       {
-        "internalType": "uint8",
+        "internalType": "address",
         "name": "",
-        "type": "uint8"
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFeesclaimable",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getTokenAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -123,12 +173,12 @@ export const abi = [
   {
     "inputs": [
       {
-        "internalType": "uint8[]",
-        "name": "_numbers",
-        "type": "uint8[]"
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
       }
     ],
-    "name": "getMultiplicator",
+    "name": "getUserBalance",
     "outputs": [
       {
         "internalType": "uint256",
@@ -140,26 +190,19 @@ export const abi = [
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getRandomNumber",
-    "outputs": [
+    "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "address",
         "name": "",
-        "type": "uint256"
+        "type": "address"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getWinningRound",
+    "name": "isStakers",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "bool",
         "name": "",
-        "type": "uint256"
+        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -208,12 +251,12 @@ export const abi = [
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "_maxRound",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "_address",
+        "type": "address"
       }
     ],
-    "name": "setMaxRound",
+    "name": "setBankAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -221,40 +264,39 @@ export const abi = [
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "_multiplicator",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "setMultiplicator",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "stakersAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
-        "internalType": "uint8",
-        "name": "_randomNumber",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "setRandomNumber",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "name": "stakersBalances",
+    "outputs": [
       {
-        "internalType": "uint8",
-        "name": "_winningRound",
-        "type": "uint8"
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
-    "name": "setWinningRound",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -266,6 +308,19 @@ export const abi = [
       }
     ],
     "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "withdrawStaking",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

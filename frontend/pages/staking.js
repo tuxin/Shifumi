@@ -1,19 +1,21 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import Layout from '@/components/Layout/Layout'
-import TokenAllow from '@/components/TokenAllow/TokenAllow'
-import ArrayResults from '@/components/ArrayResults/ArrayResults'
+
+import ArrayHistoryStaking from '@/components/ArrayHistoryStaking/ArrayHistoryStaking'
+import ArrayStaking from '@/components/ArrayStaking/ArrayStaking'
 import { useAccount, useProvider, useSigner } from 'wagmi'
 import { TableContainer ,Table ,TableCaption ,Thead ,Tr ,Th,Tbody,Td,Tfoot,SimpleGrid,CardFooter,VStack,InputLeftElement,show,FormLabel,InputGroup,inputEl,InputRightElement,loading     ,Select,NumberInput ,NumberInputField ,NumberInputStepper ,NumberIncrementStepper ,NumberDecrementStepper ,Center,RadioGroup ,Radio,useColorMode ,Button,Box,Spacer,Grid,HStack,Flex,Text,GridItem,LinkBox,Heading,LinkOverlay,Stat,StatGroup,StatLabel,StatNumber,StatHelpText,StatArrow,Card,CardHeader,CardBody,Stack,StackDivider } from '@chakra-ui/react'
-import { Alert, AlertIcon, AlertTitle, AlertDescription,} from '@chakra-ui/react'
+import { Alert, AlertIcon, AlertTitle, AlertDescription,useToast } from '@chakra-ui/react'
 import { Input } from '@chakra-ui/react'
 import { ConnectButton, getDefaultWallets } from '@rainbow-me/rainbowkit';
 import "@fontsource/cinzel-decorative"
 import "@fontsource/archivo-black"
 import { ethers } from 'ethers'
-import { contractAddress, abi } from "../public/contracts/ConstantsCoinFlip.js"
-import { contractAddressBank, abiBank } from "../public/contracts/ConstantsBankShifumi.js"
+import { contractAddressStakingShifumi, abiStakingShifumi } from "../public/contracts/ConstantsStakingShifumi.js"
+import { abiERC20 } from "../public/contracts/ConstantsERC20.js"
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router'
 
 export default function Staking() {
   
@@ -22,38 +24,38 @@ export default function Staking() {
   const { address, isConnected } = useAccount()
   const  provider  = useProvider()
   const { colorMode, toggleColorMode } = useColorMode()
-  const [winningAmoutMessage, setWinningAmount] = useState("1 x 1,97 = 1,97");
-  const [multiplicator, setMultiplicator] = useState(null)
-  const handleWinningAmountChange  = (event) => {
-    setWinningAmount(event.target.value);
-  };
+  const router = useRouter()
+  const toast = useToast()
+  
 
-  useEffect(()=> {
-      if(isConnected){
-        getDatas()
-      }
-  },[address])
+    const setTheStack = async() => {
+      try {
+        const contractStaking = new ethers.Contract(contractAddressStakingShifumi, abiStakingShifumi, signer)
+        const tokenamount = document.getElementById("inputvaluestaking").value;
+        const tokenAddress = await contractStaking.getTokenAddress()
 
-  const getDatas = async() => {
-    const contract = new ethers.Contract(contractAddress,abi,provider)
+        const contractERC20 = new ethers.Contract(tokenAddress,abiERC20,signer)
+        const allowancetoken = await contractERC20.allowance(address,contractAddressStakingShifumi)
+       
+        if(document.getElementById("inputvaluestaking").value>ethers.utils.formatEther(allowancetoken)){
+          document.getElementById("buttonstake").innerHTML="Approve token before stake"
+          let transaction = await contractERC20.approve(contractAddressStakingShifumi,ethers.utils.parseEther(tokenamount))
+          await transaction.wait()
 
-    //Find the multiplicator
-    let multiplicatorvalue = await contract.getMultiplicator([1])
-    multiplicatorvalue= multiplicatorvalue/10
-    setMultiplicator(multiplicatorvalue.toString())
-  }
-
-  const setTheBet = async() => {
-    try {
-        const contract = new ethers.Contract(contractAddressBank, abiBank, signer)
-        if(contractAddress,document.getElementById("inputaddress").value==ethers.constants.AddressZero){
-          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1],{ value: ethers.utils.parseUnits("1", "ether") })
+          document.getElementById("buttonstake").innerHTML="You can stake now"
         }else{
-          let transaction = await contract.bet(contractAddress,document.getElementById("inputaddress").value,document.getElementById("inputvaluebet").value,[1])
+          let transaction = await contractStaking.addStaking(ethers.utils.parseEther(tokenamount))
+          await transaction.wait()
+          router.push('/staking')
+          toast({
+            title: 'Congratulations',
+            description: "You send your coin to staking address",
+            status: 'success',
+            duration: 9000,
+            isClosable: true,
+        })
+          
         }
-        await transaction.wait()
-        router.push('/coinflip')
-        console.log("Success")
     }
     catch(e) {
         console.log(e)
@@ -158,11 +160,9 @@ export default function Staking() {
               
           <Grid templateColumns='repeat(5, 1fr)' gap={4}>
         <GridItem colSpan={2} >
-          {isConnected ? (
-            <Text>Your Shifhumi balance :</Text>
-          ) : (
+          
             <Text></Text>
-          )}
+          
         </GridItem>
          <GridItem colStart={6} colEnd={6} align="right">
           <ConnectButton />
@@ -312,38 +312,22 @@ export default function Staking() {
                   
                   <Box>
                     <Center>
-                      <Text fontSize="50" fontFamily="Archivo Black">X {multiplicator}</Text>
-                    </Center>
-                  </Box>
-                  <Box>
-                    <Center>
                       <Image width="128" height="128" src='/heads.png' alt='Shifumi' />
                     </Center>
                   </Box>
                   <Box>
                     <Center>                  
-                      <Input width="30%" placeholder='Amount' type='number' align="center" id="inputvaluebet" onChange={handleWinningAmountChange}/>
-                    </Center> 
-                  </Box>
-                  <Box>
-                    <Center>
-                      <SimpleGrid fontSize="13" w="30%" columns={2} spacing={1}>
-                      <Box>Payout: 3</Box>
-                      <Box align="right" >3% fees = 0.03</Box>
-                      <Box >Bankroll:  30994</Box>
-                      <Box align="right">Max payout: 2000</Box>
-                      </SimpleGrid>
+                      <Input width="30%" placeholder='Amount' type='number' align="center" id="inputvaluestaking"/>
                     </Center> 
                   </Box>
                   <Box>
                     <Center>
                     {isConnected ? (
-                    <Button width="30%" colorScheme='red' id="buttonconnect" onClick={() => setTheBet()}>Heads to win matic</Button>
+                    <Button width="30%" colorScheme='red' id="buttonstake" onClick={() => setTheStack()}>Stake your coin</Button>
                     
-                  ) : (
-                    <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
-                  )}
-                      <Input type="hidden" id="inputaddress" />
+                    ) : (
+                      <Button width="30%" colorScheme='red'>Please connect your wallet</Button>
+                    )} 
                     </Center> 
                   </Box>
                 </VStack>
@@ -363,7 +347,7 @@ export default function Staking() {
                   <br></br>
                 </Box>
 
-               <TokenAllow />
+               <ArrayStaking />
                 
               </Stack>
             </CardBody>
@@ -373,7 +357,7 @@ export default function Staking() {
       </Grid>
           
           <br></br>
-          <ArrayResults />
+          <ArrayHistoryStaking />
           
         </GridItem>
       </Grid>
