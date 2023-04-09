@@ -37,8 +37,6 @@ export default function Home() {
       if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
           document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
       }
-
-      
     }
     
   };
