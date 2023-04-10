@@ -46,6 +46,8 @@ Difficulties to test ChainLink VRF
 
 ![Coverage](https://github.com/tuxin/Shifumi/blob/main/Coverage.PNG?raw=true)
 
+## Schema
+
 ![Schema](https://github.com/tuxin/Shifumi/blob/main/ShifumiSchema.png?raw=true)
 
 
