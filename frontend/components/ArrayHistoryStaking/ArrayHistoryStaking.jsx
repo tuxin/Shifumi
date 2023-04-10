@@ -14,7 +14,7 @@ const ArrayStaking = () => {
 
     const [inprogressbet, setInprogressbet] = useState(null)
     const [donebet, setDonebet] = useState(null)
-
+    const { address, isConnected } = useAccount()
    
   
     const  provider  = useProvider()
@@ -32,8 +32,6 @@ const ArrayStaking = () => {
        // );
        // setInprogressbet(tableinprogress)
     //})
-
-   
     const getEvents = async() => {
         const events = await contractev.queryFilter('Staking',34161296);
         const listItems = events.map((number) =>
@@ -46,8 +44,16 @@ const ArrayStaking = () => {
         ).reverse();
         setDonebet(listItems)
     }
-    getEvents()
+    if(isConnected){
+      getEvents()
+    }
 
+    useEffect(()=> {
+      if(isConnected){
+        getEvents()
+      }
+    },[address])
+   
   return (
     <>
     <Card >

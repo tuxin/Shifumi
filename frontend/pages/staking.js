@@ -81,7 +81,7 @@ export default function Staking() {
       >
         <GridItem rowSpan={2} colSpan={1}  >
         
-          <Card alignItems="top"> 
+        <Card alignItems="top"> 
           <Flex width="80%" justifyContent="space-between" alignItems="center">
                 <Image width="1000" height="200" src='/logo.png' alt='Shifumi' />
                
@@ -95,12 +95,12 @@ export default function Staking() {
                   </Heading>
                   <br></br>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                     <a href="/">Shifumi</a>
+                     <a href="/shifumi">Shifumi (Soon)</a>
                   </Text>
                 </Box>
                 <Box>
                   <Text pt='1' fontSize='sm' fontFamily="alice">
-                    Coin Flip
+                  <a href="/coinflip">Coin Flip</a>
                   </Text>
                 </Box>
                 <Box>

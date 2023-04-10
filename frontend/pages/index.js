@@ -374,10 +374,10 @@ export default function Home() {
                   <Box>
                     <Center>
                       <SimpleGrid fontSize="13" w="30%" columns={2} spacing={1}>
-                      <Box>Payout: 3</Box>
+                      <Box></Box>
                       <Box align="right" >3% fees = 0.03</Box>
-                      <Box >Bankroll:  30994</Box>
-                      <Box align="right">Max payout: 2000</Box>
+                      <Box ></Box>
+                      <Box align="right"></Box>
                       </SimpleGrid>
                     </Center> 
                   </Box>

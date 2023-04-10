@@ -29,16 +29,16 @@ export default function Home() {
   const [textCoin, setTextCoin] = useState("Heads");
   
   const handleWinningAmountChange = async() => {
-
-    if(document.getElementById("inputaddress").value!=ethers.constants.AddressZero){
-      const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
-      const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
-
-      if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
-          document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
+    if(document.getElementById("inputaddress").value!=""){
+      if(document.getElementById("inputaddress").value!=ethers.constants.AddressZero){
+        const contractERC20 = new ethers.Contract(document.getElementById("inputaddress").value,abiERC20,provider)
+        const arrayAllowToken = await contractERC20.allowance(address,contractAddressBank)
+  
+        if(document.getElementById("inputvaluebet").value>ethers.utils.formatEther(arrayAllowToken)){
+            document.getElementById("buttonconnect").innerHTML="Approve "+document.getElementById("inputaddressname").value
+        }
       }
-    }
-    
+    }    
   };
 
   useEffect(()=> {

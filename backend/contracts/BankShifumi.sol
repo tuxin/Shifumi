@@ -256,6 +256,7 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         return (names, balances);
     }
 
+    /// @notice Call back Chainlink from the VRF
     function fulfillRandomWords(
         uint256 _requestId,
         uint256[] memory _randomWords
@@ -311,6 +312,8 @@ contract BankShifumi is Ownable,Pausable,VRFConsumerBaseV2  {
         emit ResultBet(betInProgress.id,IDataInterfaceGame(betInProgress.gameAddress).getGameName(),betInProgress.playerAddress,betInProgress.amount,betInProgress.numbers,betInProgress.multiplier,betInProgress.tokenName,block.timestamp,resultName,randomNumber,winningAmount);
     }
 
+    /// @notice Send the winning amount to the winner
+    /// @dev Send the winning amount, gas amount or token amout
     function sendPayout(address _player,address _token,uint256 winningAmount) internal{
         if(_token==address(0)){
                 (bool sent, bytes memory data) = payable(_player).call{value: winningAmount}("");
